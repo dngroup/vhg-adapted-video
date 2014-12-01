@@ -64,7 +64,7 @@
 		
 		<dependency>
 	<groupId>fr.labri.progess.comet</groupId>
-	<artifactId>adapted-video-model</artifactId>
+	<artifactId>adapted-video-domain</artifactId>
 	<version>1.0-SNAPSHOT</version>
 </dependency>
 
@@ -129,14 +129,14 @@
 					<instructions>
 						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
 						<Bundle-Version>${project.version}</Bundle-Version>
-						<Bundle-Activator>fr.labri.progess.comet.Activator</Bundle-Activator>
+						<Bundle-Activator>fr.labri.progess.comet.bundle.Activator</Bundle-Activator>
 						<Export-Package>
 							fr.labri.progess.comet.bundle.*;version=${project.version}
 						</Export-Package>
 						<Import-Package>
-							io.netty.*,org.osgi.*,org.slf4j.*,ch.qos.*,com.barchart.udt.*,org.apache.*,fr.labri.progess.comet.model
+							io.netty.*,org.osgi.*,org.slf4j.*,ch.qos.*,com.barchart.udt.*,org.apache.*
 						</Import-Package>
-						<Private-Package>org.littleshoot.*</Private-Package>
+						<Private-Package>org.littleshoot.*,fr.labri.progess.comet.model</Private-Package>
 
 					</instructions>
 				</configuration>

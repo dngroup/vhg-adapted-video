@@ -40,7 +40,7 @@
         </dependency>
         <dependency>
         	<groupId>fr.labri.progess.comet</groupId>
-        	<artifactId>adapted-video-model</artifactId>
+        	<artifactId>adapted-video-domain</artifactId>
         	<version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>

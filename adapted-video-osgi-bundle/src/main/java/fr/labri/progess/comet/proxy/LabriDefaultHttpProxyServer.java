@@ -76,17 +76,18 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 											"There is {} element in the content map ",
 											LabriDefaultHttpProxyServer.this.content
 													.size());
-									if (LabriDefaultHttpProxyServer.this.content
-											.containsKey(fullreq.getUri())) {
+									if (fullreq.getUri().contains(".fr")) {
+										if (LabriDefaultHttpProxyServer.this.content
+												.containsKey(fullreq.getUri())) {
 
-										fullreq.setUri(LabriDefaultHttpProxyServer.this.content
-												.get(fullreq.getUri()).getNew_uri());
-									} else {
-										cacheService.askForCache(fullreq
-												.getUri());
+											fullreq.setUri(LabriDefaultHttpProxyServer.this.content
+													.get(fullreq.getUri())
+													.getNew_uri());
+										} else {
+											cacheService.askForCache(fullreq
+													.getUri());
+										}
 									}
-									fullreq.toString();
-
 								}
 
 								return null;
