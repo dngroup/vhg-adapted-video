@@ -59,6 +59,7 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 	public LabriDefaultHttpProxyServer(
 			final ConcurrentMap<String, Content> content) {
 		this.content = content;
+		LOGGER.debug("content is {}",this.content);
 		InetSocketAddress addr = new InetSocketAddress("172.16.1.1", 8084);
 		server = DefaultHttpProxyServer.bootstrap().withAddress(addr)
 				.withFiltersSource(new HttpFiltersSource() {

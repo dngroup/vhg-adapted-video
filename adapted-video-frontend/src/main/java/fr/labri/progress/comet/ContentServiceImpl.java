@@ -18,7 +18,7 @@ public class ContentServiceImpl implements ContentService {
 	@Override
 	public void addCacheRequest(Content content) {
 		content.setId(UUID.randomUUID().toString());
-		content.setNew_uri("http://google.fr");
+		content.setNew_uri("http://www.google.com");
 		content.setCreated(new Date());
 		map.put(content.getUri(), content);
 

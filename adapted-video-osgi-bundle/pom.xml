@@ -134,9 +134,9 @@
 							fr.labri.progess.comet.bundle.*;version=${project.version}
 						</Export-Package>
 						<Import-Package>
-							io.netty.*,org.osgi.*,org.slf4j.*,ch.qos.*,com.barchart.udt.*,org.apache.*
+							io.netty.*,org.osgi.*,org.slf4j.*,ch.qos.*,com.barchart.udt.*,org.apache.*,javax.ws.rs.*,org.quartz.*
 						</Import-Package>
-						<Private-Package>org.littleshoot.*,fr.labri.progess.comet.model</Private-Package>
+						<Private-Package>org.littleshoot.*,fr.labri.progess.comet.*</Private-Package>
 
 					</instructions>
 				</configuration>
