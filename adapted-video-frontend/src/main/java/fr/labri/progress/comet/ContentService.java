@@ -1,0 +1,16 @@
+package fr.labri.progress.comet;
+
+import java.util.Collection;
+
+import fr.labri.progess.comet.model.Content;
+import fr.labri.progress.comet.exception.NoNewUriException;
+
+public interface ContentService {
+
+	public void addCacheRequest(Content content);
+
+	public Collection<Content> getCache();
+	
+	public String getUriFromId(String id) throws NoNewUriException;
+
+}

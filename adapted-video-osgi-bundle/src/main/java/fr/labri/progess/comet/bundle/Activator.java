@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package fr.labri.progess.comet;
+package fr.labri.progess.comet.bundle;
 
 import org.littleshoot.proxy.HttpProxyServer;
 import org.osgi.framework.BundleActivator;
@@ -22,13 +22,15 @@ import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import fr.labri.progess.comet.proxy.LabriDefaultHttpProxyServer;
+
 public class Activator implements BundleActivator {
 
 	Logger logger = LoggerFactory.getLogger(Activator.class);
 	HttpProxyServer server;
 
 	public void start(BundleContext context) {
-		server = new LabriDefaultHttpProxyServer();
+		server = new LabriDefaultHttpProxyServer(null);
 		
 		
 		
