@@ -26,7 +26,7 @@ import javax.ws.rs.core.Application;
 public class Main {
 	// Base URI the Grizzly HTTP server will listen on
 
-	public static final String BASE_HOST = "localhost";
+	public static final String BASE_HOST = "0.0.0.0";
 	public static final int BASE_PORT = 8082;
 	public static final String BASE_PATH = "api";
 

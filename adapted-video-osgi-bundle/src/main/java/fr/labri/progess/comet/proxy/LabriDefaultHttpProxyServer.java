@@ -3,10 +3,16 @@ package fr.labri.progess.comet.proxy;
 import fr.labri.progess.comet.model.Content;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultHttpRequest;
+import io.netty.handler.codec.http.DefaultHttpResponse;
+import io.netty.handler.codec.http.FullHttpMessage;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpVersion;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -29,6 +35,74 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class LabriDefaultHttpProxyServer implements HttpProxyServer {
+
+	private final class LabriHttpFilterSource implements HttpFiltersSource {
+		public HttpFilters filterRequest(HttpRequest originalRequest) {
+			return new LabriHttpFiltersAdapter(originalRequest, null);
+		}
+
+		@Override
+		public HttpFilters filterRequest(HttpRequest originalRequest,
+				ChannelHandlerContext ctx) {
+			return filterRequest(originalRequest);
+		}
+
+		@Override
+		public int getMaximumRequestBufferSizeInBytes() {
+			return Integer.MAX_VALUE;
+		}
+
+		@Override
+		public int getMaximumResponseBufferSizeInBytes() {
+			return Integer.MAX_VALUE;
+		}
+	}
+
+	private final class LabriHttpFiltersAdapter extends HttpFiltersAdapter {
+		private LabriHttpFiltersAdapter(HttpRequest originalRequest,
+				ChannelHandlerContext ctx) {
+			super(originalRequest, ctx);
+		}
+
+		@Override
+		public HttpObject serverToProxyResponse(HttpObject httpObject) {
+
+			if (httpObject instanceof FullHttpMessage) {
+
+				FullHttpMessage fullreq = (FullHttpMessage) httpObject;
+				String headerValue = fullreq.headers().get("Content-Type");
+				if (headerValue != null && headerValue.contains("video/mp4")) {
+					cacheService.askForCache(this.originalRequest.getUri());
+				}
+
+			}
+
+			return httpObject;
+
+		}
+
+		@Override
+		public HttpResponse clientToProxyRequest(HttpObject httpObject) {
+			if (httpObject instanceof FullHttpMessage) {
+
+				FullHttpRequest fullreq = (FullHttpRequest) httpObject;
+				if (content.containsKey(fullreq.getUri())
+						&& !fullreq.headers()
+								.contains("X-LABRI-TRAVERSE-PROXY")) {
+					HttpResponse response = new DefaultHttpResponse(
+							HttpVersion.HTTP_1_1, HttpResponseStatus.TEMPORARY_REDIRECT);
+					response.headers().add("X-LABRI-TRAVERSE-PROXY", "");
+					response.headers().add(
+							"Location",
+							"http://172.16.1.1:8082/api/content/"
+									+ content.get(fullreq.getUri()).getId());
+					return response;
+				}
+
+			}
+			return null;
+		}
+	}
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(LabriDefaultHttpProxyServer.class);
@@ -59,60 +133,10 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 	public LabriDefaultHttpProxyServer(
 			final ConcurrentMap<String, Content> content) {
 		this.content = content;
-		LOGGER.debug("content is {}",this.content);
+		LOGGER.debug("content is {}", this.content);
 		InetSocketAddress addr = new InetSocketAddress("172.16.1.1", 8084);
 		server = DefaultHttpProxyServer.bootstrap().withAddress(addr)
-				.withFiltersSource(new HttpFiltersSource() {
-
-					public HttpFilters filterRequest(HttpRequest originalRequest) {
-						return new HttpFiltersAdapter(originalRequest, null) {
-							@Override
-							public HttpResponse clientToProxyRequest(
-									HttpObject httpObject) {
-
-								if (httpObject instanceof HttpRequest) {
-
-									HttpRequest fullreq = (HttpRequest) httpObject;
-									LOGGER.debug(
-											"There is {} element in the content map ",
-											LabriDefaultHttpProxyServer.this.content
-													.size());
-									if (fullreq.getUri().contains(".fr")) {
-										if (LabriDefaultHttpProxyServer.this.content
-												.containsKey(fullreq.getUri())) {
-
-											fullreq.setUri(LabriDefaultHttpProxyServer.this.content
-													.get(fullreq.getUri())
-													.getNew_uri());
-										} else {
-											cacheService.askForCache(fullreq
-													.getUri());
-										}
-									}
-								}
-
-								return null;
-							}
-						};
-					}
-
-					@Override
-					public HttpFilters filterRequest(
-							HttpRequest originalRequest,
-							ChannelHandlerContext ctx) {
-						return filterRequest(originalRequest);
-					}
-
-					@Override
-					public int getMaximumRequestBufferSizeInBytes() {
-						return Integer.MAX_VALUE;
-					}
-
-					@Override
-					public int getMaximumResponseBufferSizeInBytes() {
-						return Integer.MAX_VALUE;
-					}
-				})
+				.withFiltersSource(new LabriHttpFilterSource())
 
 				.start();
 

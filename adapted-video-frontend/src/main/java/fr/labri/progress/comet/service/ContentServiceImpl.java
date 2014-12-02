@@ -1,5 +1,7 @@
 package fr.labri.progress.comet.service;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -31,6 +33,12 @@ public class ContentServiceImpl implements ContentService {
 
 		CachedContent cachedContent = CachedContent.fromContent(content);
 		cachedContent.setId(UUID.randomUUID().toString());
+		try {
+			cachedContent.setNewUri(new URI("http://www.google.Fr"));
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		repo.save(cachedContent);
 
 	}
