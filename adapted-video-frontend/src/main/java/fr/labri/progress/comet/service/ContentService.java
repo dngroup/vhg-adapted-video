@@ -1,4 +1,4 @@
-package fr.labri.progress.comet;
+package fr.labri.progress.comet.service;
 
 import java.util.Collection;
 

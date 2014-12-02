@@ -1,4 +1,4 @@
-package fr.labri.progress.comet;
+package fr.labri.progress.comet.service;
 
 import java.util.Collection;
 import java.util.Date;
@@ -8,9 +8,12 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.springframework.stereotype.Service;
+
 import fr.labri.progess.comet.model.Content;
 import fr.labri.progress.comet.exception.NoNewUriException;
 
+@Service
 public class ContentServiceImpl implements ContentService {
 
 	private static final ConcurrentMap<String, Content> map = new ConcurrentHashMap<String, Content>();

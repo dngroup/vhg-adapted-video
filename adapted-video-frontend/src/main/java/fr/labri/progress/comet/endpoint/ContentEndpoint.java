@@ -1,10 +1,9 @@
-package fr.labri.progress.comet;
+package fr.labri.progress.comet.endpoint;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -19,21 +18,32 @@ import jersey.repackaged.com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.labri.progess.comet.model.Content;
 import fr.labri.progess.comet.model.ContentWrapper;
 import fr.labri.progress.comet.exception.NoNewUriException;
+import fr.labri.progress.comet.service.ContentService;
 
 /**
- * Root resource (exposed at "myresource" path)
+ * provides access to content through jax-rs rest api
+ * 
+ * @author nherbaut
+ *
  */
 @Path("content")
 public class ContentEndpoint {
 
+	public ContentEndpoint() {
+		LOGGER.debug("created");
+
+	}
+
 	private final static Logger LOGGER = LoggerFactory
 			.getLogger(ContentEndpoint.class);
 
-	private static final ContentService contentService = new ContentServiceImpl();
+	@Autowired
+	protected ContentService contentService = null;
 
 	@GET
 	@Produces(MediaType.APPLICATION_XML)
