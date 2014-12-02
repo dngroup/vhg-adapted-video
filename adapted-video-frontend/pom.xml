@@ -103,13 +103,25 @@
 			<artifactId>jcl-over-slf4j</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
 
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-jpa</artifactId>
 
 		</dependency>
 
+
+
+
+		<dependency>
+			<groupId>org.springframework.amqp</groupId>
+			<artifactId>spring-rabbit</artifactId>
+
+		</dependency>
 
 
 	</dependencies>
@@ -137,7 +149,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<mainClass>fr.labri.progress.comet.Main</mainClass>
+					<mainClass>fr.labri.progress.comet.app.Main</mainClass>
 				</configuration>
 			</plugin>
 		</plugins>

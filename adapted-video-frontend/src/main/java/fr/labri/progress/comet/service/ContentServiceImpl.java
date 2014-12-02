@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import com.google.common.base.Function;
@@ -27,18 +28,16 @@ public class ContentServiceImpl implements ContentService {
 
 	@Inject
 	CachedContentRepository repo;
+	
+	@Inject
+	WorkerMessageService workerMessageService;
 
 	@Override
 	public void addCacheRequest(Content content) {
 
 		CachedContent cachedContent = CachedContent.fromContent(content);
 		cachedContent.setId(UUID.randomUUID().toString());
-		try {
-			cachedContent.setNewUri(new URI("http://www.google.Fr"));
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		workerMessageService.sendDownloadOrder(cachedContent.getOldUri().toString(),cachedContent.getId());
 		repo.save(cachedContent);
 
 	}
