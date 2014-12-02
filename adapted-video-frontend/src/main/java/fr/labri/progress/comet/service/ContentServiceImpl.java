@@ -8,38 +8,53 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import javax.inject.Inject;
+
 import org.springframework.stereotype.Service;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 
 import fr.labri.progess.comet.model.Content;
 import fr.labri.progress.comet.exception.NoNewUriException;
+import fr.labri.progress.comet.model.CachedContent;
+import fr.labri.progress.comet.repository.CachedContentRepository;
 
 @Service
 public class ContentServiceImpl implements ContentService {
 
-	private static final ConcurrentMap<String, Content> map = new ConcurrentHashMap<String, Content>();
+	@Inject
+	CachedContentRepository repo;
 
 	@Override
 	public void addCacheRequest(Content content) {
-		content.setId(UUID.randomUUID().toString());
-		content.setNew_uri("http://www.google.com");
-		content.setCreated(new Date());
-		map.put(content.getUri(), content);
+
+		CachedContent cachedContent = CachedContent.fromContent(content);
+		cachedContent.setId(UUID.randomUUID().toString());
+		repo.save(cachedContent);
 
 	}
 
 	@Override
 	public Collection<Content> getCache() {
 
-		return map.values();
+		return Lists.transform(repo.findAll(),
+				new Function<CachedContent, Content>() {
+
+					@Override
+					public Content apply(CachedContent input) {
+						return CachedContent.toContent(input);
+					}
+				});
 	}
 
 	@Override
 	public String getUriFromId(String id) throws NoNewUriException {
-		for (Content cont : map.values()) {
-			if (id.equals(cont.getId())) {
-				return cont.getNew_uri();
-			}
+		CachedContent cc = repo.findOne(id);
+		if (cc != null) {
+			return cc.getNewUri().toString();
 		}
+
 		throw new NoNewUriException();
 	}
 

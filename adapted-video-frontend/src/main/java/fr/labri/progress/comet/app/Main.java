@@ -6,6 +6,7 @@ import org.glassfish.grizzly.servlet.ServletRegistration;
 import org.glassfish.grizzly.servlet.WebappContext;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.servlet.ServletContainer;
+import org.hsqldb.server.Server;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.ContextLoaderListener;
@@ -39,6 +40,8 @@ public class Main {
 	public static void main(String[] args) throws IOException,
 			InterruptedException {
 
+		// WEB APP SETUP
+
 		// instead of using web.xml, we use java-based configuration
 		WebappContext webappContext = new WebappContext("production");
 
@@ -51,17 +54,16 @@ public class Main {
 				AnnotationConfigWebApplicationContext.class.getName());
 
 		// and where spring should find its configuration
-		webappContext
-				.addContextInitParameter(ContextLoader.CONFIG_LOCATION_PARAM,
-						SpringConfiguration.class.getName());
+		webappContext.addContextInitParameter(
+				ContextLoader.CONFIG_LOCATION_PARAM,
+				SpringConfiguration.class.getName());
 		// attache the jersey servlet to this context
 		ServletRegistration jerseyServlet = webappContext.addServlet(
 				"jersey-servlet", ServletContainer.class);
 
 		// configure it with extern configuration class
 		jerseyServlet.setInitParameter("javax.ws.rs.Application",
-				fr.labri.progress.comet.conf.RestConfiguration.class
-						.getName());
+				fr.labri.progress.comet.conf.RestConfiguration.class.getName());
 
 		// finally, map it to the path
 		jerseyServlet.addMapping("/" + BASE_PATH + "/*");
@@ -82,6 +84,15 @@ public class Main {
 				.format("Jersey app started with WADL available at http://"
 						+ BASE_HOST + ":" + BASE_PORT + "/" + BASE_PATH
 						+ "/application.wadl"));
+
+		// DATABASE SETUP
+
+		Server dbServer = new Server();
+
+		dbServer.setDatabaseName(0, "cache-orchestrator");
+		dbServer.setDatabasePath(0, "mem:cache-orchestrator");
+		dbServer.setDaemon(true);
+		dbServer.start();
 
 		// wait for the server to die before we quit
 		Thread.currentThread().join();
