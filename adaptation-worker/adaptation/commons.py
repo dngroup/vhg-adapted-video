@@ -3,8 +3,19 @@ import subprocess
 __author__ = 'nherbaut'
 import math
 import os
-
+import tempfile
 from pymediainfo import MediaInfo
+import urllib
+
+
+def download_file(url, id):
+    print("downloading %s", url)
+    file = os.path.join(tempfile.mkdtemp(), id)
+    print("downloading in %s", file)
+    opener = urllib.URLopener()
+    opener.retrieve(url, file)
+    print("downloaded in %s", file)
+    return file
 
 
 def get_video_size(input_file):
@@ -85,21 +96,18 @@ def chunk_dash(files_in, folder_out):
     if not os.path.exists(folder_out):
         os.makedirs(folder_out)
 
-
     args = "MP4Box -dash 4000 -profile onDemand "
-    for i in range(0,len(files_in)):
+    for i in range(0, len(files_in)):
+        args += files_in[i] + "#video:id=v" + str(i) + " "
 
-        args+=files_in[i]+ "#video:id=v"+str(i)+" "
-
-    args+= " -out " + folder_out+"/playlist.mpd"
-
+    args += " -out " + folder_out + "/ playlist.mpd"
 
     subprocess.call(args, shell=True)
 
 
 def add_playlist_info(main_playlist_folder, version_playlist_file, bitrate):
     main_playlist_file = main_playlist_folder + "/playlist.m3u8"
-
+    version_playlist_file=os.path.relpath(version_playlist_file,main_playlist_folder)
     with open(main_playlist_file, "a") as f:
         f.write("#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=" + str(
             bitrate * 1000) + ",RESOLUTION=" + version_playlist_file + "\n")
