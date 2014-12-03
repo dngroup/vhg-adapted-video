@@ -51,6 +51,7 @@ def transcode(file_in, folder_out, dimensions, bitrate):
     dimsp = str(dimensions[0]) + ":" + str(dimensions[1])
     file_out = folder_out \
                + "/" + dims + ".mp4"
+
     if not os.path.exists(folder_out):
         os.makedirs(folder_out)
     subprocess.call(
@@ -80,12 +81,28 @@ def chunk_hls(file_in, folder_out, dimensions, segtime=4):
     return target_transcoded_folder + "/playlist.m3u8"
 
 
+def chunk_dash(files_in, folder_out):
+    if not os.path.exists(folder_out):
+        os.makedirs(folder_out)
+
+
+    args = "MP4Box -dash 4000 -profile onDemand "
+    for i in range(0,len(files_in)):
+
+        args+=files_in[i]+ "#video:id=v"+str(i)+" "
+
+    args+= " -out " + folder_out+"/playlist.mpd"
+
+
+    subprocess.call(args, shell=True)
+
+
 def add_playlist_info(main_playlist_folder, version_playlist_file, bitrate):
     main_playlist_file = main_playlist_folder + "/playlist.m3u8"
 
     with open(main_playlist_file, "a") as f:
         f.write("#EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=" + str(
-            bitrate * 1000) + ",RESOLUTION=" + version_playlist_file+"\n")
+            bitrate * 1000) + ",RESOLUTION=" + version_playlist_file + "\n")
 
 
 def add_playlist_header(playlist_folder):
