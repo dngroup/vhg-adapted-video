@@ -32,6 +32,7 @@ public class RabbitMqConfiguration {
 		RabbitTemplate template = new RabbitTemplate(cf);
 		template.setRoutingKey(this.celeryQueueName);
 		template.setEncoding("utf-8");
+		
 
 		return template;
 	}
