@@ -2,8 +2,6 @@ package fr.labri.progress.comet.conf;
 
 import javax.inject.Inject;
 
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -18,10 +16,10 @@ public class RabbitMqConfiguration {
 	@Bean
 	ConnectionFactory connectionFactory() {
 		CachingConnectionFactory connectionFactory = new CachingConnectionFactory(
-				"localhost");
-		connectionFactory.setUsername("guest");
-		connectionFactory.setPassword("guest");
-		connectionFactory.setPort(5672);
+				CliConfSingleton.rabbitHost);
+		connectionFactory.setUsername(CliConfSingleton.rabbitUser);
+		connectionFactory.setPassword(CliConfSingleton.rabbitPassword);
+		connectionFactory.setPort(CliConfSingleton.rabbitPort);
 
 		return connectionFactory;
 	}
@@ -32,7 +30,6 @@ public class RabbitMqConfiguration {
 		RabbitTemplate template = new RabbitTemplate(cf);
 		template.setRoutingKey(this.celeryQueueName);
 		template.setEncoding("utf-8");
-		
 
 		return template;
 	}

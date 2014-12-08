@@ -1,23 +1,22 @@
 package fr.labri.progress.comet.app;
 
+import java.io.IOException;
+
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.servlet.ServletRegistration;
 import org.glassfish.grizzly.servlet.WebappContext;
-import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.hsqldb.server.Server;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
+import com.lexicalscope.jewel.cli.CliFactory;
+import com.lexicalscope.jewel.cli.Option;
+
+import fr.labri.progress.comet.conf.CliConfSingleton;
 import fr.labri.progress.comet.conf.SpringConfiguration;
-
-import java.io.IOException;
-import java.net.URI;
-
-import javax.ws.rs.core.Application;
 
 /**
  * Main class.
@@ -26,8 +25,6 @@ import javax.ws.rs.core.Application;
 public class Main {
 	// Base URI the Grizzly HTTP server will listen on
 
-	public static final String BASE_HOST = "0.0.0.0";
-	public static final int BASE_PORT = 8082;
 	public static final String BASE_PATH = "api";
 
 	/**
@@ -39,6 +36,17 @@ public class Main {
 	 */
 	public static void main(String[] args) throws IOException,
 			InterruptedException {
+
+		CliConfiguration cliconf = CliFactory.parseArguments(
+				CliConfiguration.class, args);
+
+		CliConfSingleton.rabbitHost = cliconf.getRabbitHost();
+		CliConfSingleton.rabbitUser = cliconf.getRabbitUser();
+		CliConfSingleton.rabbitPassword = cliconf.getRabbitPassword();
+		CliConfSingleton.rabbitPort = cliconf.getRabbitPort();
+
+		String baseHost = cliconf.getHost();
+		int pasePort = cliconf.getPort();
 
 		// WEB APP SETUP
 
@@ -72,8 +80,8 @@ public class Main {
 		HttpServer server = new HttpServer();
 
 		// configure a network listener with our configuration
-		NetworkListener listener = new NetworkListener("grizzly2", BASE_HOST,
-				BASE_PORT);
+		NetworkListener listener = new NetworkListener("grizzly2", baseHost,
+				pasePort);
 		server.addListener(listener);
 
 		// finally, deploy the webapp
@@ -82,7 +90,7 @@ public class Main {
 
 		System.out.println(String
 				.format("Jersey app started with WADL available at http://"
-						+ BASE_HOST + ":" + BASE_PORT + "/" + BASE_PATH
+						+ baseHost + ":" + pasePort + "/" + BASE_PATH
 						+ "/application.wadl"));
 
 		// DATABASE SETUP
@@ -97,4 +105,28 @@ public class Main {
 		// wait for the server to die before we quit
 		Thread.currentThread().join();
 	}
+}
+
+interface CliConfiguration {
+
+	@Option(shortName = "p", longName = "port", defaultValue = "8080", description = "the port on which the frontend will listen for http connections")
+	Integer getPort();
+
+	@Option(shortName = "h", longName = "host", defaultValue = "localhost", description = "the hostname or IP on which the frontend will listen for http connections")
+	String getHost();
+
+	@Option(longName = "rabbitHost", defaultValue = "localhost")
+	String getRabbitHost();
+
+	@Option(longName = "rabbitUser", defaultValue = "guest")
+	String getRabbitUser();
+
+	@Option(longName = "rabbitPassword", defaultValue = "guest")
+	String getRabbitPassword();
+
+	@Option(longName = "rabbitPort", defaultValue = "5672")
+	Integer getRabbitPort();
+
+	@Option(helpRequest = true)
+	boolean getHelp();
 }
