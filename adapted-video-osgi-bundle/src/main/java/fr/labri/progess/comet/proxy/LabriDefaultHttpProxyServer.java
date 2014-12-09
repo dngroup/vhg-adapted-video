@@ -72,7 +72,10 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 
 				FullHttpMessage fullreq = (FullHttpMessage) httpObject;
 				String headerValue = fullreq.headers().get("Content-Type");
-				if (headerValue != null && headerValue.contains("video/mp4")) {
+				if (headerValue != null && headerValue.contains("video/mp4")
+						&& !content.containsKey(this.originalRequest.getUri())) {
+					LOGGER.debug("asked for cache for resource {}",
+							this.originalRequest.getUri());
 					cacheService.askForCache(this.originalRequest.getUri());
 				}
 
@@ -90,6 +93,9 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 				if (content.containsKey(fullreq.getUri())
 						&& !fullreq.headers()
 								.contains("X-LABRI-TRAVERSE-PROXY")) {
+
+					LOGGER.debug("Potentially cached resource foudn");
+
 					HttpResponse response = new DefaultHttpResponse(
 							HttpVersion.HTTP_1_1,
 							HttpResponseStatus.TEMPORARY_REDIRECT);
@@ -110,8 +116,8 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(LabriDefaultHttpProxyServer.class);
 	HttpProxyServer server;
-	protected ConcurrentMap<String, Content> content;
-	final private CacheService cacheService = new CacheService();
+	final protected ConcurrentMap<String, Content> content;
+	final private CacheService cacheService;
 	final private LabriConfig config;
 
 	public int getIdleConnectionTimeout() {
@@ -138,6 +144,8 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 			final ConcurrentMap<String, Content> content) {
 		this.content = content;
 		this.config = config;
+		this.cacheService = new CacheService(this.config.getFrontalHostName(),
+				this.config.getFrontalPort());
 		LOGGER.debug("content is {}", this.content);
 		InetSocketAddress addr = new InetSocketAddress(
 				this.config.getHostName(), this.config.getPort());

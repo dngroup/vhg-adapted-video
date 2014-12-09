@@ -18,8 +18,8 @@ import fr.labri.progess.comet.model.Content;
 @Entity
 public class CachedContent implements Serializable {
 
-	private URI oldUri;
-	private URI newUri;
+	private String oldUri;
+
 	@Id
 	private String id;
 	private Date createdAt;
@@ -30,20 +30,12 @@ public class CachedContent implements Serializable {
 		super();
 	}
 
-	public URI getOldUri() {
+	public String getOldUri() {
 		return this.oldUri;
 	}
 
-	public void setOldUri(URI oldUri) {
+	public void setOldUri(String oldUri) {
 		this.oldUri = oldUri;
-	}
-
-	public URI getNewUri() {
-		return this.newUri;
-	}
-
-	public void setNewUri(URI newUri) {
-		this.newUri = newUri;
 	}
 
 	public String getId() {
@@ -76,11 +68,8 @@ public class CachedContent implements Serializable {
 			c.setCreatedAt(new Date(content.getCreated().getTime()));
 
 		c.setId(content.getId());
-		try {
-			c.setOldUri(new URI(content.getUri()));
-		} catch (URISyntaxException e) {
-			Throwables.propagate(e);
-		}
+
+		c.setOldUri(content.getUri());
 
 		return c;
 	}
@@ -91,9 +80,7 @@ public class CachedContent implements Serializable {
 			c.setCreated(new Date(content.createdAt.getTime()));
 		c.setId(content.getId());
 		if (content.getOldUri() != null)
-			c.setUri(content.getOldUri().toString());
-		if (content.getNewUri() != null)
-			c.setNew_uri(content.getNewUri().toString());
+			c.setUri(content.getOldUri());
 
 		return c;
 	}

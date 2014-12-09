@@ -44,6 +44,8 @@ public class Main {
 		CliConfSingleton.rabbitUser = cliconf.getRabbitUser();
 		CliConfSingleton.rabbitPassword = cliconf.getRabbitPassword();
 		CliConfSingleton.rabbitPort = cliconf.getRabbitPort();
+		CliConfSingleton.streamerHost = cliconf.getStreamerHost();
+		CliConfSingleton.streamerPort = cliconf.getStreamerPort();
 
 		String baseHost = cliconf.getHost();
 		int pasePort = cliconf.getPort();
@@ -126,6 +128,12 @@ interface CliConfiguration {
 
 	@Option(longName = "rabbitPort", defaultValue = "5672")
 	Integer getRabbitPort();
+
+	@Option(longName = "streamer-port", defaultValue = "80", description = "the port on which the streamer will stream its data")
+	Integer getStreamerPort();
+
+	@Option(longName = "streamer-host", defaultValue = "streamer", description = "the host on which the streamer will stream its data")
+	String getStreamerHost();
 
 	@Option(helpRequest = true)
 	boolean getHelp();

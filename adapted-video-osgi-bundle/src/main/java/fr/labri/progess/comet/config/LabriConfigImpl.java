@@ -27,17 +27,17 @@ public class LabriConfigImpl implements LabriConfig {
 
 	@Override
 	public Integer getPort() {
-		return Integer.valueOf(props.getProperty("port", "8084"));
+		return Integer.valueOf(props.getProperty("port", "8080"));
 	}
 
 	@Override
 	public String getFrontalHostName() {
-		return props.getProperty("frontalHost", "0.0.0.0");
+		return props.getProperty("frontalHost", "frontal");
 	}
 
 	@Override
 	public Integer getFrontalPort() {
-		return Integer.valueOf(props.getProperty("frontalPort", "8084"));
+		return Integer.valueOf(props.getProperty("frontalPort", "8080"));
 	}
 
 }

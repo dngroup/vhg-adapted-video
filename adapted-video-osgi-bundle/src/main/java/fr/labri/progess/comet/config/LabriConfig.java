@@ -3,15 +3,15 @@ package fr.labri.progess.comet.config;
 import com.lexicalscope.jewel.cli.Option;
 
 public interface LabriConfig {
-	@Option(defaultValue = "0.0.0.0", helpRequest = true)
+	@Option(longName="host", defaultValue = "0.0.0.0" )
 	String getHostName();
 
-	@Option(defaultValue = "8084", helpRequest = true)
+	@Option(longName="port",  defaultValue = "8080")
 	Integer getPort();
 
-	@Option(defaultValue = "localhost", helpRequest = true)
+	@Option(longName="frontalHostName",defaultValue = "frontal")
 	String getFrontalHostName();
 
-	@Option(defaultValue = "8082", helpRequest = true)
+	@Option(longName="frontalPort", defaultValue = "8080")
 	Integer getFrontalPort();
 }

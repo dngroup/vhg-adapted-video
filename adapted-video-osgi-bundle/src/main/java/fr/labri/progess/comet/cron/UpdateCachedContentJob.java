@@ -44,7 +44,9 @@ public class UpdateCachedContentJob implements Job {
 
 			content.clear();
 			for (Content con : wrapper.getContents()) {
+
 				content.put(con.getUri(), con);
+
 			}
 		} catch (ProcessingException e) {
 			LOGGER.warn("failed to access frontend on {}, I will retry later",

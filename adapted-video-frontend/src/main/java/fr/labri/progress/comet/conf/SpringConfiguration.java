@@ -1,5 +1,6 @@
 package fr.labri.progress.comet.conf;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -14,6 +15,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import fr.labri.progress.comet.service.WorkerMessageService;
+
 /**
  * this class is responsible for configuring spring context and repositories
  * 
@@ -26,6 +29,14 @@ import org.springframework.transaction.PlatformTransactionManager;
 @EnableJpaRepositories("fr.labri.progress.comet.repository")
 @Import(RabbitMqConfiguration.class)
 public class SpringConfiguration {
+
+	
+	@Inject
+	WorkerMessageService wms;
+	@PostConstruct
+	public void setupQueue() {
+		wms.setupResultQueue();
+	}
 
 	@Bean
 	public DataSource ds() {

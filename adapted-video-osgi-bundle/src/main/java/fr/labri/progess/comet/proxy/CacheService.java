@@ -11,11 +11,18 @@ import fr.labri.progess.comet.model.Content;
 public class CacheService {
 
 	final Client client = ClientBuilder.newClient();
+	private String url;
+	private Integer port;
+
+	public CacheService(String url, Integer port) {
+		this.url = url;
+		this.port = port;
+	}
 
 	void askForCache(String uri) {
 
-		WebTarget target = client.target("http://localhost:8082").path("api")
-				.path("content");
+		WebTarget target = client.target("http://" + url + ":" + this.port)
+				.path("api").path("content");
 		Content content = new Content();
 		content.setUri(uri);
 		target.request().async()

@@ -13,6 +13,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 
 import jersey.repackaged.com.google.common.collect.Lists;
 
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.labri.progess.comet.model.Content;
 import fr.labri.progess.comet.model.ContentWrapper;
+import fr.labri.progress.comet.conf.CliConfSingleton;
 import fr.labri.progress.comet.exception.NoNewUriException;
 import fr.labri.progress.comet.service.ContentService;
 
@@ -66,12 +68,13 @@ public class ContentEndpoint {
 	@GET
 	public Response getone(@PathParam("contentId") String contentId)
 			throws URISyntaxException {
-		try {
-			return Response.seeOther(
-					new URI(contentService.getUriFromId(contentId))).build();
-		} catch (NoNewUriException e) {
-			throw new WebApplicationException(404);
-		}
+
+		URI newUri = UriBuilder
+				.fromPath(
+						"http://" + CliConfSingleton.streamerHost + ":"
+								+ CliConfSingleton.streamerPort)
+				.path(contentId).path("encoding").path("low.mp4").build();
+		return Response.seeOther(newUri).build();
 
 	}
 }

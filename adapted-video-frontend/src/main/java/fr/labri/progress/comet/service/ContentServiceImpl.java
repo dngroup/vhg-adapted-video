@@ -12,10 +12,14 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
 import fr.labri.progess.comet.model.Content;
@@ -28,41 +32,47 @@ public class ContentServiceImpl implements ContentService {
 
 	@Inject
 	CachedContentRepository repo;
-	
+
 	@Inject
 	WorkerMessageService workerMessageService;
+
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(ContentServiceImpl.class);
 
 	@Override
 	public void addCacheRequest(Content content) {
 
+		if (!repo.findByOldUri(content.getUri()).isEmpty()) {
+			LOGGER.info("already have a video transcoding for this URI, but it's not ready");
+			return;
+		}
+
 		CachedContent cachedContent = CachedContent.fromContent(content);
-		cachedContent.setId(UUID.randomUUID().toString());
-		workerMessageService.sendDownloadOrder(cachedContent.getOldUri().toString(),cachedContent.getId());
+		cachedContent.setId(UUID.randomUUID().toString().replace("-", ""));
 		repo.save(cachedContent);
+		workerMessageService.sendDownloadOrder(cachedContent.getOldUri()
+				.toString(), cachedContent.getId());
+		
 
 	}
 
 	@Override
 	public Collection<Content> getCache() {
 
-		return Lists.transform(repo.findAll(),
+		return Collections2.filter(Lists.transform(repo.findAll(),
 				new Function<CachedContent, Content>() {
 
 					@Override
 					public Content apply(CachedContent input) {
 						return CachedContent.toContent(input);
 					}
-				});
-	}
+				}), new Predicate<Content>() {
 
-	@Override
-	public String getUriFromId(String id) throws NoNewUriException {
-		CachedContent cc = repo.findOne(id);
-		if (cc != null) {
-			return cc.getNewUri().toString();
-		}
-
-		throw new NoNewUriException();
+			@Override
+			public boolean apply(Content input) {
+				return input.getCreated() != null;
+			}
+		});
 	}
 
 }

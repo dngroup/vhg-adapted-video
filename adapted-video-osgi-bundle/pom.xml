@@ -135,7 +135,7 @@
 						<Import-Package>
 							io.netty.*,org.osgi.*,org.slf4j.*,ch.qos.*,com.barchart.udt.*,org.apache.*,javax.ws.rs.*,org.quartz.*
 						</Import-Package>
-						<Private-Package>org.littleshoot.*,fr.labri.progess.comet.*</Private-Package>
+						<Private-Package>org.littleshoot.*,fr.labri.progess.comet.*,com.lexicalscope.*</Private-Package>
 					</instructions>
 				</configuration>
 			</plugin>

@@ -11,18 +11,18 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Content {
 
 	String uri;
-	String new_uri;
-
-	public String getNew_uri() {
-		return new_uri;
-	}
-
-	public void setNew_uri(String new_uri) {
-		this.new_uri = new_uri;
-	}
 
 	String id;
 	Date created;
+	Boolean cached;
+
+	public Boolean getCached() {
+		return cached;
+	}
+
+	public void setCached(Boolean cached) {
+		this.cached = cached;
+	}
 
 	public String getUri() {
 		return uri;

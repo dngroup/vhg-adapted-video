@@ -32,6 +32,7 @@ public class App {
 			SchedulerUtils.setupScheduler(content, result.getFrontalHostName(),
 					result.getFrontalPort());
 		} catch (ArgumentValidationException e) {
+			e.printStackTrace();
 			System.out.println(e.getMessage());
 		}
 
