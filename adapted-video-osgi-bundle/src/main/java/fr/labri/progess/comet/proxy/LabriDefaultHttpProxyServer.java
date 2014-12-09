@@ -1,5 +1,6 @@
 package fr.labri.progess.comet.proxy;
 
+import fr.labri.progess.comet.config.LabriConfig;
 import fr.labri.progess.comet.model.Content;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultHttpRequest;
@@ -90,11 +91,13 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 						&& !fullreq.headers()
 								.contains("X-LABRI-TRAVERSE-PROXY")) {
 					HttpResponse response = new DefaultHttpResponse(
-							HttpVersion.HTTP_1_1, HttpResponseStatus.TEMPORARY_REDIRECT);
+							HttpVersion.HTTP_1_1,
+							HttpResponseStatus.TEMPORARY_REDIRECT);
 					response.headers().add("X-LABRI-TRAVERSE-PROXY", "");
 					response.headers().add(
 							"Location",
-							"http://172.16.1.1:8082/api/content/"
+							"http://" + config.getFrontalHostName() + ":"
+									+ config.getFrontalPort() + "/api/content/"
 									+ content.get(fullreq.getUri()).getId());
 					return response;
 				}
@@ -109,6 +112,7 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 	HttpProxyServer server;
 	protected ConcurrentMap<String, Content> content;
 	final private CacheService cacheService = new CacheService();
+	final private LabriConfig config;
 
 	public int getIdleConnectionTimeout() {
 		return server.getIdleConnectionTimeout();
@@ -130,11 +134,13 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 		return server.getListenAddress();
 	}
 
-	public LabriDefaultHttpProxyServer(
+	public LabriDefaultHttpProxyServer(LabriConfig config,
 			final ConcurrentMap<String, Content> content) {
 		this.content = content;
+		this.config = config;
 		LOGGER.debug("content is {}", this.content);
-		InetSocketAddress addr = new InetSocketAddress("172.16.1.1", 8084);
+		InetSocketAddress addr = new InetSocketAddress(
+				this.config.getHostName(), this.config.getPort());
 		server = DefaultHttpProxyServer.bootstrap().withAddress(addr)
 				.withFiltersSource(new LabriHttpFilterSource())
 

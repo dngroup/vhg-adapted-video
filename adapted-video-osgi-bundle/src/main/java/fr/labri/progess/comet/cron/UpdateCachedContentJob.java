@@ -1,6 +1,5 @@
 package fr.labri.progess.comet.cron;
 
-
 import java.util.concurrent.ConcurrentMap;
 
 import javax.ws.rs.ProcessingException;
@@ -27,12 +26,19 @@ public class UpdateCachedContentJob implements Job {
 	@Override
 	public void execute(JobExecutionContext context)
 			throws JobExecutionException {
+		final String frontalHost = (String) context.getJobDetail()
+				.getJobDataMap().get("frontalHost");
+		final Integer frontalPort = (Integer) context.getJobDetail()
+				.getJobDataMap().get("frontalPort");
+
+		final String frontalUrl = ("http://" + frontalHost + ":" + frontalPort);
 		try {
 			@SuppressWarnings("unchecked")
 			final ConcurrentMap<String, Content> content = (ConcurrentMap<String, Content>) context
 					.getJobDetail().getJobDataMap().get("content-cache");
-			WebTarget target = client.target("http://localhost:8082")
-					.path("api").path("content");
+
+			WebTarget target = client.target(frontalUrl).path("api")
+					.path("content");
 			ContentWrapper wrapper = target.request(MediaType.APPLICATION_XML)
 					.get(ContentWrapper.class);
 
@@ -41,7 +47,8 @@ public class UpdateCachedContentJob implements Job {
 				content.put(con.getUri(), con);
 			}
 		} catch (ProcessingException e) {
-			LOGGER.warn("failed to access frontend, I will retry later");
+			LOGGER.warn("failed to access frontend on {}, I will retry later",
+					frontalUrl);
 		}
 	}
 }
