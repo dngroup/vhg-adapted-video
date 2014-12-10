@@ -16,8 +16,10 @@
  */
 package fr.labri.progess.comet.bundle;
 
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.littleshoot.proxy.HttpProxyServer;
 import org.osgi.framework.BundleActivator;
@@ -29,6 +31,7 @@ import fr.labri.progess.comet.config.LabriConfig;
 import fr.labri.progess.comet.config.LabriConfigImpl;
 import fr.labri.progess.comet.cron.SchedulerUtils;
 import fr.labri.progess.comet.model.Content;
+import fr.labri.progess.comet.model.FilterConfig;
 import fr.labri.progess.comet.proxy.LabriDefaultHttpProxyServer;
 
 public class Activator implements BundleActivator {
@@ -39,9 +42,10 @@ public class Activator implements BundleActivator {
 
 	public void start(BundleContext context) {
 		final ConcurrentMap<String, Content> content = new ConcurrentHashMap<String, Content>();
-		server = new LabriDefaultHttpProxyServer(config, content);
-		SchedulerUtils.setupScheduler(content, config.getFrontalHostName(),
-				config.getFrontalPort());
+		final Set<FilterConfig> filterConfigs = new CopyOnWriteArraySet<FilterConfig>();
+		server = new LabriDefaultHttpProxyServer(config, content, filterConfigs);
+		SchedulerUtils.setupScheduler(content, filterConfigs,
+				config.getFrontalHostName(), config.getFrontalPort());
 
 	}
 
