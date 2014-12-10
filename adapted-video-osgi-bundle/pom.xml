@@ -14,6 +14,7 @@
 		<maven-bundle-plugin.version>2.5.0</maven-bundle-plugin.version>
 		<osgi.version>5.0.0</osgi.version>
 		<karaf.dir>/home/nherbaut/Libraries/apache-karaf-3.0.2/deploy</karaf.dir>
+		<netty.version>4.0.24.Final</netty.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -31,16 +32,26 @@
 
 
 		<dependency>
-	<groupId>com.lexicalscope.jewelcli</groupId>
-	<artifactId>jewelcli</artifactId>
-	<version>0.8.9</version>
-</dependency>
+			<groupId>com.lexicalscope.jewelcli</groupId>
+			<artifactId>jewelcli</artifactId>
+			<version>0.8.9</version>
+		</dependency>
 
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>
-			<version>4.0.24.Final</version>
+			<version>${netty.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-transport-native-epoll</artifactId>
+			<version>${netty.version}</version>
+
+		</dependency>
+
+
+
 		<dependency>
 			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-client</artifactId>

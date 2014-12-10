@@ -6,6 +6,7 @@ import fr.labri.progess.comet.model.FilterConfig;
 import fr.labri.progess.comet.model.Content;
 import fr.labri.progess.comet.model.HeaderFilter;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.DefaultHttpRequest;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.FullHttpMessage;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -45,12 +46,12 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 
 		@Override
 		public int getMaximumRequestBufferSizeInBytes() {
-			return Integer.MAX_VALUE;
+			return 0;
 		}
 
 		@Override
 		public int getMaximumResponseBufferSizeInBytes() {
-			return Integer.MAX_VALUE;
+			return 0;
 		}
 	}
 
@@ -63,19 +64,22 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 		@Override
 		public HttpObject serverToProxyResponse(HttpObject httpObject) {
 
-			if (httpObject instanceof FullHttpMessage) {
+			if (httpObject instanceof DefaultHttpResponse) {
 
-				FullHttpResponse fullreq = (FullHttpResponse) httpObject;
+				DefaultHttpResponse fullreq = (DefaultHttpResponse) httpObject;
 
 				HttpHeaders headers = fullreq.headers();
+				final String uri = this.originalRequest.getUri();
 				if (fullreq.getStatus().code() >= 200
 						&& fullreq.getStatus().code() < 300) {
 					if (checkForFilters(headers)
 							|| checkForFileExtension(this.originalRequest
 									.getUri())) {
-						LOGGER.debug("asked for cache for resource {}",
-								this.originalRequest.getUri());
+						LOGGER.debug("asked for cache for resource {}", uri);
 						cacheService.askForCache(this.originalRequest.getUri());
+					} else {
+						LOGGER.trace("resouce {} is NOT going to be cached",
+								uri);
 					}
 				}
 
@@ -118,9 +122,9 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 
 		@Override
 		public HttpResponse clientToProxyRequest(HttpObject httpObject) {
-			if (httpObject instanceof FullHttpMessage) {
+			if (httpObject instanceof DefaultHttpRequest) {
 
-				FullHttpRequest fullreq = (FullHttpRequest) httpObject;
+				DefaultHttpRequest fullreq = (DefaultHttpRequest) httpObject;
 				if (content.containsKey(fullreq.getUri())
 						&& !fullreq.headers()
 								.contains("X-LABRI-TRAVERSE-PROXY")) {
