@@ -1,6 +1,7 @@
 package fr.labri.progress.comet.service;
 
 import java.sql.Date;
+import java.util.Collections;
 
 import javax.inject.Inject;
 
@@ -12,12 +13,14 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.ChannelAwareMessageListener;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.amqp.support.converter.SimpleMessageConverter;
 import org.springframework.stereotype.Service;
 
+import com.rabbitmq.client.AMQP.Queue;
 import com.rabbitmq.client.Channel;
 
 import fr.labri.progress.comet.model.CachedContent;
@@ -28,8 +31,13 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(WorkerMessageServiceImpl.class);
+
+	public static final String RESULTQUEUE = "transcode-result";
 	@Inject
 	volatile RabbitTemplate template;
+
+	@Inject
+	volatile RabbitAdmin admin;
 
 	@Inject
 	volatile ConnectionFactory conFact;
@@ -64,9 +72,11 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 
 	@Override
 	public void setupResultQueue() {
+
 		SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
 		container.setConnectionFactory(conFact);
-		container.setQueueNames("transcode-result");
+		container.setQueueNames(RESULTQUEUE);
+
 		container.setMessageListener(new ChannelAwareMessageListener() {
 
 			SimpleMessageConverter conv = new SimpleMessageConverter();
@@ -82,12 +92,14 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 				if (mess[1].equals("COMPLETE")) {
 					LOGGER.info("work complete for task {}", mess[0]);
 					CachedContent content = repo.findOne(mess[0]);
-					if(content!=null){
-					content.setCreatedAt(new Date(System.currentTimeMillis()));
-					repo.save(content);
-					}
-					else{
-						LOGGER.warn("received COMPLETE message for unknown task {}",mess[0]);
+					if (content != null) {
+						content.setCreatedAt(new Date(System
+								.currentTimeMillis()));
+						repo.save(content);
+					} else {
+						LOGGER.warn(
+								"received COMPLETE message for unknown task {}",
+								mess[0]);
 					}
 				} else {
 					LOGGER.info("received {} from task {}", mess[1], mess[0]);
@@ -95,6 +107,10 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 
 			}
 		});
+
+		// declaring the queue if it's not already present
+		admin.declareQueue(new org.springframework.amqp.core.Queue(RESULTQUEUE,
+				true, false, false, Collections.EMPTY_MAP));
 
 		container.start();
 	}

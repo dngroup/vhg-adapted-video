@@ -29,6 +29,17 @@
           <target>1.7</target>
         </configuration>
       </plugin>
+      
+      <plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.5.2</version>
+			
+				<configuration>
+				<skipAssembly>true</skipAssembly>
+			
+				</configuration>
+			</plugin>
+			
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
