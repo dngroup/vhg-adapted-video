@@ -5,8 +5,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class LabriConfigImpl implements LabriConfig {
 
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(LabriConfigImpl.class);
 	Properties props = new Properties();
 	private static final String CONFIG_FILE = "/var/local/labri/config.properties";
 
@@ -15,8 +20,9 @@ public class LabriConfigImpl implements LabriConfig {
 		try {
 			props.load(new FileReader(CONFIG_FILE));
 		} catch (IOException e) {
-			throw new RuntimeException("failed to load properties in "
-					+ CONFIG_FILE, e);
+			LOGGER.warn(
+					"failed to read config file {}, default values will be used",
+					CONFIG_FILE);
 		}
 	}
 

@@ -13,7 +13,7 @@
 	<properties>
 		<maven-bundle-plugin.version>2.5.0</maven-bundle-plugin.version>
 		<osgi.version>5.0.0</osgi.version>
-		<karaf.dir>/home/nherbaut/Libraries/apache-karaf-3.0.2/deploy</karaf.dir>
+		<karaf.dir>/home/nherbaut/Libraries/apache-karaf-4.0.0.M1/deploy</karaf.dir>
 		<netty.version>4.0.24.Final</netty.version>
 	</properties>
 	<dependencies>
