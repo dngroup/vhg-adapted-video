@@ -64,16 +64,16 @@ public class ContentEndpoint {
 		return Response.ok().build();
 	}
 
-	@Path("{contentId}")
+	@Path("{contentId}/{quality}")
 	@GET
-	public Response getone(@PathParam("contentId") String contentId)
+	public Response getone(@PathParam("contentId") String contentId,@PathParam("quality") String quality)
 			throws URISyntaxException {
 
 		URI newUri = UriBuilder
 				.fromPath(
 						"http://" + CliConfSingleton.streamerHost + ":"
 								+ CliConfSingleton.streamerPort)
-				.path(contentId).path("encoding").path("low.mp4").build();
+				.path(contentId).path("encoding").path(quality+".mp4").build();
 		return Response.seeOther(newUri).build();
 
 	}

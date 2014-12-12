@@ -15,6 +15,12 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.AnnotationIntrospector;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
+
 import fr.labri.progress.comet.service.WorkerMessageService;
 
 /**
@@ -30,6 +36,16 @@ import fr.labri.progress.comet.service.WorkerMessageService;
 @Import(RabbitMqConfiguration.class)
 public class SpringConfiguration {
 
+	
+	@Bean
+	public ObjectMapper getObjectMapper(){
+		ObjectMapper om = new ObjectMapper();
+		AnnotationIntrospector introspector = new JaxbAnnotationIntrospector(
+				TypeFactory.defaultInstance());
+		om.setAnnotationIntrospector(introspector);
+		return om;
+		
+	}
 	
 	@Inject
 	WorkerMessageService wms;

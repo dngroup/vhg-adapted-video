@@ -19,7 +19,9 @@ import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.amqp.support.converter.SimpleMessageConverter;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ErrorHandler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.AMQP.Queue;
 import com.rabbitmq.client.Channel;
 
@@ -44,6 +46,9 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 
 	@Inject
 	volatile CachedContentRepository repo;
+
+	@Inject
+	ObjectMapper mapper;
 
 	private static final MessageProperties props = new MessageProperties();
 
@@ -85,24 +90,27 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 			public void onMessage(Message message, Channel channel)
 					throws Exception {
 
-				String str = new String((byte[]) conv.fromMessage(message),
-						"UTF-8");
-
-				String[] mess = str.split("=");
-				if (mess[1].equals("COMPLETE")) {
-					LOGGER.info("work complete for task {}", mess[0]);
-					CachedContent content = repo.findOne(mess[0]);
-					if (content != null) {
+				WorkerMessage wm = mapper.readValue(
+						(byte[]) conv.fromMessage(message), WorkerMessage.class);
+				CachedContent content = repo.findOne(wm.getMain_task_id());
+				if (content != null) {
+					if (wm.getComplete() == null || !wm.getComplete()) {
+						LOGGER.debug(
+								"new quality {} received for content id:{}",
+								wm.getQuality(), wm.getMain_task_id());
+						content.getQualities().add(wm.getQuality());
+					} else {
+						LOGGER.debug("work on content id:{} is done",
+								wm.getMain_task_id());
 						content.setCreatedAt(new Date(System
 								.currentTimeMillis()));
-						repo.save(content);
-					} else {
-						LOGGER.warn(
-								"received COMPLETE message for unknown task {}",
-								mess[0]);
 					}
+					
+					repo.save(content);
 				} else {
-					LOGGER.info("received {} from task {}", mess[1], mess[0]);
+					LOGGER.warn(
+							"received received job message for unknown task {}",
+							wm.main_task_id);
 				}
 
 			}
@@ -112,6 +120,16 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 		admin.declareQueue(new org.springframework.amqp.core.Queue(RESULTQUEUE,
 				true, false, false, Collections.EMPTY_MAP));
 
+		container.setErrorHandler(new ErrorHandler() {
+
+			@Override
+			public void handleError(Throwable t) {
+				LOGGER.warn("error received while using rabbitmq container, trying to redeclare the queue");
+				admin.declareQueue(new org.springframework.amqp.core.Queue(
+						RESULTQUEUE, true, false, false, Collections.EMPTY_MAP));
+
+			}
+		});
 		container.start();
 	}
 }

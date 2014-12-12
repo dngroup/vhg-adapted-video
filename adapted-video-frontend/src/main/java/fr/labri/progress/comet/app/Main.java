@@ -124,16 +124,16 @@ interface CliConfiguration {
 	@Option(shortName = "h", longName = "host", defaultValue = "localhost", description = "the hostname or IP on which the frontend will listen for http connections")
 	String getHost();
 
-	@Option(longName = "rabbitHost", defaultValue = "localhost")
+	@Option(longName = "rabbit-host", defaultValue = "localhost")
 	String getRabbitHost();
 
-	@Option(longName = "rabbitUser", defaultValue = "guest")
+	@Option(longName = "rabbit-user", defaultValue = "guest")
 	String getRabbitUser();
 
-	@Option(longName = "rabbitPassword", defaultValue = "guest")
+	@Option(longName = "rabbit-password", defaultValue = "guest")
 	String getRabbitPassword();
 
-	@Option(longName = "rabbitPort", defaultValue = "5672")
+	@Option(longName = "rabbit-port", defaultValue = "5672")
 	Integer getRabbitPort();
 
 	@Option(longName = "streamer-port", defaultValue = "80", description = "the port on which the streamer will stream its data")

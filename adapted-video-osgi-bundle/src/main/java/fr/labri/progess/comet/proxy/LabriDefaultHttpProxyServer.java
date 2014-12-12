@@ -19,8 +19,11 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 
 import java.net.InetSocketAddress;
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+
+import javax.ws.rs.core.UriBuilder;
 
 import org.littleshoot.proxy.HttpFilters;
 import org.littleshoot.proxy.HttpFiltersAdapter;
@@ -125,21 +128,28 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 			if (httpObject instanceof DefaultHttpRequest) {
 
 				DefaultHttpRequest fullreq = (DefaultHttpRequest) httpObject;
-				if (content.containsKey(fullreq.getUri())
-						&& !fullreq.headers()
-								.contains("X-LABRI-TRAVERSE-PROXY")) {
+				Content c = null;
+				// only return if content exist & at least one quality is
+				// available
+				if ((c = content.get(fullreq.getUri())) != null
+						&& c.getQualities().size() > 0) {
 
-					LOGGER.debug("Potentially cached resource foudn");
+					LOGGER.debug("Cached resource found {}", c.getUri());
 
 					HttpResponse response = new DefaultHttpResponse(
 							HttpVersion.HTTP_1_1,
 							HttpResponseStatus.TEMPORARY_REDIRECT);
-					response.headers().add("X-LABRI-TRAVERSE-PROXY", "");
-					response.headers().add(
-							"Location",
-							"http://" + config.getFrontalHostName() + ":"
-									+ config.getFrontalPort() + "/api/content/"
-									+ content.get(fullreq.getUri()).getId());
+					Collections.shuffle(c.getQualities());
+
+					String redirectUri = UriBuilder
+							.fromPath(
+									"http://" + config.getFrontalHostName() + ":"
+											+ config.getFrontalPort())
+
+							.path("api").path("content").path(c.getId())
+							.path(c.getQualities().get(0)).build().toString();
+					response.headers().add("Location", redirectUri);
+					LOGGER.debug("Redirecting it to ", redirectUri);
 					return response;
 				}
 

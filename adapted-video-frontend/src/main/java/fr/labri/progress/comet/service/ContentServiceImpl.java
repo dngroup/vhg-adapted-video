@@ -23,6 +23,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
 import fr.labri.progess.comet.model.Content;
+import fr.labri.progress.comet.conf.CliConfSingleton;
 import fr.labri.progress.comet.exception.NoNewUriException;
 import fr.labri.progress.comet.model.CachedContent;
 import fr.labri.progress.comet.repository.CachedContentRepository;
@@ -46,33 +47,38 @@ public class ContentServiceImpl implements ContentService {
 			LOGGER.info("already have a video transcoding for this URI, but it's not ready");
 			return;
 		}
+		URI contentUri;
+		try {
+			contentUri = new URI(content.getUri());
+			if (contentUri.getHost().equals(CliConfSingleton.streamerHost)) {
+				LOGGER.debug("Streamer delivered video are not cached");
+				return;
+			}
+		} catch (URISyntaxException e) {
+			LOGGER.warn("invalid URI is ignored by frontal {}",
+					content.getUri(), e);
+		}
 
 		CachedContent cachedContent = CachedContent.fromContent(content);
 		cachedContent.setId(UUID.randomUUID().toString().replace("-", ""));
 		repo.save(cachedContent);
 		workerMessageService.sendDownloadOrder(cachedContent.getOldUri()
 				.toString(), cachedContent.getId());
-		
 
 	}
 
 	@Override
 	public Collection<Content> getCache() {
 
-		return Collections2.filter(Lists.transform(repo.findAll(),
+		return Lists.transform(repo.findAll(),
 				new Function<CachedContent, Content>() {
 
 					@Override
 					public Content apply(CachedContent input) {
 						return CachedContent.toContent(input);
 					}
-				}), new Predicate<Content>() {
+				});
 
-			@Override
-			public boolean apply(Content input) {
-				return input.getCreated() != null;
-			}
-		});
 	}
 
 }

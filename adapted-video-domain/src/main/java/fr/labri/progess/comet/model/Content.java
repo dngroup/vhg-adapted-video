@@ -1,6 +1,10 @@
 package fr.labri.progess.comet.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -15,6 +19,15 @@ public class Content {
 	String id;
 	Date created;
 	Boolean cached;
+	List<String> qualities = new ArrayList<String>();
+
+	public List<String> getQualities() {
+		return qualities;
+	}
+
+	public void setQualities(List<String> qualities) {
+		this.qualities = qualities;
+	}
 
 	public Boolean getCached() {
 		return cached;
