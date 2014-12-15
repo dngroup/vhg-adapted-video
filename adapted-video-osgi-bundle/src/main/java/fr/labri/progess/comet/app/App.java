@@ -10,6 +10,7 @@ import org.littleshoot.proxy.HttpProxyServer;
 
 import com.lexicalscope.jewel.cli.ArgumentValidationException;
 import com.lexicalscope.jewel.cli.CliFactory;
+import com.lexicalscope.jewel.cli.HelpRequestedException;
 import com.lexicalscope.jewel.cli.Option;
 
 import fr.labri.progess.comet.bundle.Activator;
@@ -31,13 +32,14 @@ public class App {
 			final Set<FilterConfig> configs = new CopyOnWriteArraySet<FilterConfig>();
 
 			HttpProxyServer server = new LabriDefaultHttpProxyServer(result,
-					content,configs);
+					content, configs);
 			server.toString();
 
-			SchedulerUtils.setupScheduler(content,configs, result.getFrontalHostName(),
-					result.getFrontalPort());
+			SchedulerUtils.setupScheduler(content, configs,
+					result.getFrontalHostName(), result.getFrontalPort());
+		} catch (HelpRequestedException e) {
+			System.out.println(e.getMessage());
 		} catch (ArgumentValidationException e) {
-			e.printStackTrace();
 			System.out.println(e.getMessage());
 		}
 

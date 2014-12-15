@@ -46,4 +46,10 @@ public class LabriConfigImpl implements LabriConfig {
 		return Integer.valueOf(props.getProperty("frontalPort", "8080"));
 	}
 
+	@Override
+	public boolean getHelp() {
+		throw new RuntimeException(
+				"that's a dummy method and should not be called");
+	}
+
 }
