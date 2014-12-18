@@ -64,6 +64,7 @@ public class ContentServiceImpl implements ContentService {
 		repo.save(cachedContent);
 		workerMessageService.sendDownloadOrder(cachedContent.getOldUri()
 				.toString(), cachedContent.getId());
+		content.setId(cachedContent.getId());
 
 	}
 

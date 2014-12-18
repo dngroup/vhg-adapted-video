@@ -30,7 +30,7 @@ public class UpdateConfigJob extends FrontalJob {
 					.getJobDetail().getJobDataMap().get("filter-config");
 
 			WebTarget target = client.target(frontalUrl).path("api")
-					.path("config").path("dummy");
+					.path("config").path("dummy");	
 			FilterConfigWrapper wrapper = target.request(
 					MediaType.APPLICATION_XML).get(FilterConfigWrapper.class);
 

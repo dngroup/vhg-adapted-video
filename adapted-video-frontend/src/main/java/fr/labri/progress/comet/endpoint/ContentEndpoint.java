@@ -37,7 +37,7 @@ import fr.labri.progress.comet.service.ContentService;
 public class ContentEndpoint {
 
 	public ContentEndpoint() {
-		LOGGER.debug("created");
+		LOGGER.trace("created");
 
 	}
 
