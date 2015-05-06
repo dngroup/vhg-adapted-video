@@ -12,6 +12,6 @@
   <modules>
     <module>adapted-video-domain</module>
     <module>adapted-video-frontend</module>
-    <module>adapted-video-osgi-bundle</module>
+    <!-- <module>adapted-video-osgi-bundle</module> -->
   </modules>
 </project>
