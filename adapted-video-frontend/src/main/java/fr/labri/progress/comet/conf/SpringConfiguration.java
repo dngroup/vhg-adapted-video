@@ -7,6 +7,9 @@ import javax.persistence.Persistence;
 import javax.sql.DataSource;
 
 import org.hsqldb.jdbc.JDBCDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.amqp.AmqpConnectException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +25,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 
 import fr.labri.progress.comet.service.WorkerMessageService;
+import fr.labri.progress.comet.service.WorkerMessageServiceImpl;
 
 /**
  * this class is responsible for configuring spring context and repositories
@@ -36,22 +40,29 @@ import fr.labri.progress.comet.service.WorkerMessageService;
 @Import(RabbitMqConfiguration.class)
 public class SpringConfiguration {
 
-	
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(SpringConfiguration.class);
+
 	@Bean
-	public ObjectMapper getObjectMapper(){
+	public ObjectMapper getObjectMapper() {
 		ObjectMapper om = new ObjectMapper();
 		AnnotationIntrospector introspector = new JaxbAnnotationIntrospector(
 				TypeFactory.defaultInstance());
 		om.setAnnotationIntrospector(introspector);
 		return om;
-		
+
 	}
-	
+
 	@Inject
 	WorkerMessageService wms;
+
 	@PostConstruct
 	public void setupQueue() {
-		wms.setupResultQueue();
+		try {
+			wms.setupResultQueue();
+		} catch (AmqpConnectException e) {
+			LOGGER.warn("failed to setup the result queue for RabbitMQ");
+		}
 	}
 
 	@Bean

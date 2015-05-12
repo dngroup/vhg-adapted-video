@@ -152,7 +152,56 @@
 
 	</dependencies>
 	<build>
+		<finalName>${project.artifactId}-${project.version}</finalName>
 		<plugins>
+
+			<plugin>
+				<groupId>org.jolokia</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.11.3</version>
+				<configuration>
+					<finalName>frontend.jar</finalName>
+					<images>
+						<image>
+							<name>nherbaut/${project.artifactId}:latest</name>
+							<alias>frontend</alias>
+
+							<build>
+
+								<assembly>
+									<descriptorRef>artifact-with-dependencies</descriptorRef>
+
+								</assembly>
+								<from>java:8-jre</from>
+								<maintainer>nherbaut@labri.fr</maintainer>
+								<tags>
+									<tag>latest</tag>
+									<tag>${project.version}</tag>
+								</tags>
+								<ports>
+									<port>8080</port>
+
+								</ports>
+
+								<command>java -cp /maven/*:/maven/${project.build.finalName}
+									fr.labri.progress.comet.app.Main --host 0.0.0.0 --port 8080
+								</command>
+
+							</build>
+
+							<run>
+
+								<ports>
+									<port>localhost:8080:8080</port>
+								</ports>
+
+
+
+							</run>
+						</image>
+					</images>
+				</configuration>
+			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.5.2</version>
