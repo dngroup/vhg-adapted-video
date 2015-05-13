@@ -158,10 +158,17 @@
 			<plugin>
 				<groupId>org.jolokia</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.11.3</version>
+				<version>0.11.4-SNAPSHOT</version>
 				<configuration>
 					<finalName>frontend.jar</finalName>
 					<images>
+						<image>
+							<name>rabbitmq:3.5.1</name>
+							<alias>broker</alias>
+
+						</image>
+
+
 						<image>
 							<name>nherbaut/${project.artifactId}:latest</name>
 							<alias>frontend</alias>
@@ -183,9 +190,9 @@
 
 								</ports>
 
-								<command>java -cp /maven/*:/maven/${project.build.finalName}
-									fr.labri.progress.comet.app.Main --host 0.0.0.0 --port 8080
-								</command>
+								<cmd>
+									<shell>java -cp /maven/*:/maven/${project.build.finalName} fr.labri.progress.comet.app.Main --host 0.0.0.0 --port 8080 --rabbit-host $AMQP_PORT_5672_TCP_ADDR --rabbit-port $AMQP_PORT_5672_TCP_PORT</shell>
+								</cmd>
 
 							</build>
 
@@ -194,6 +201,11 @@
 								<ports>
 									<port>localhost:8080:8080</port>
 								</ports>
+								<links>
+									<link>
+										broker:amqp
+									</link>
+								</links>
 
 
 
