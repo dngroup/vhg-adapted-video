@@ -64,7 +64,6 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 			super(originalRequest, ctx);
 		}
 
-		@Override
 		public HttpObject serverToProxyResponse(HttpObject httpObject) {
 
 			if (httpObject instanceof DefaultHttpResponse) {
@@ -123,7 +122,6 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 			return false;
 		}
 
-		@Override
 		public HttpResponse clientToProxyRequest(HttpObject httpObject) {
 			if (httpObject instanceof DefaultHttpRequest) {
 
@@ -143,8 +141,8 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 
 					String redirectUri = UriBuilder
 							.fromPath(
-									"http://" + config.getFrontalHostName() + ":"
-											+ config.getFrontalPort())
+									"http://" + config.getFrontalHostName()
+											+ ":" + config.getFrontalPort())
 
 							.path("api").path("content").path(c.getId())
 							.path(c.getQualities().get(0)).build().toString();
@@ -201,6 +199,17 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 				.withFiltersSource(new LabriHttpFilterSource())
 
 				.start();
+
+	}
+
+	@Override
+	public void abort() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void setThrottle(long arg0, long arg1) {
 
 	}
 }

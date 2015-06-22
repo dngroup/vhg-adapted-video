@@ -165,19 +165,67 @@
 						<image>
 							<name>rabbitmq:3.5.1</name>
 							<alias>broker</alias>
+							<run>
+								<wait>
+									<time>2000</time>
+								</wait>
+								<ports>
+									<port>5672:5672</port>
+								</ports>
+							</run>
 
 						</image>
+						<image>
+							<name>httpd:latest</name>
+							<alias>streamer</alias>
+							<run>
+								<ports>
+									<port>localhost:8081:80</port>
+								</ports>
+								<volumes>
+									<bind>
+										<volume>/usr/local/apache2/htdocs</volume>
+									</bind>
+								</volumes>
+							</run>
 
+						</image>
+						<image>
+							<name>nherbaut/adaptation-worker:latest</name>
+							<alias>worker</alias>
+							<run>
+								<volumes>
+									<from>
+										<image>streamer</image>
+									</from>
+								</volumes>
+								<links>
+									<link>broker:amqp</link>
+								</links>
+							</run>
+						</image>
+						<image>
+							<name>nherbaut/adaptation-worker:latest</name>
+							<alias>worker2</alias>
+							<run>
+								<volumes>
+									<from>
+										<image>streamer</image>
+									</from>
+								</volumes>
+								<links>
+									<link>broker:amqp</link>
+								</links>
+							</run>
+						</image>
 
 						<image>
 							<name>nherbaut/${project.artifactId}:latest</name>
 							<alias>frontend</alias>
 
 							<build>
-
 								<assembly>
 									<descriptorRef>artifact-with-dependencies</descriptorRef>
-
 								</assembly>
 								<from>java:8-jre</from>
 								<maintainer>nherbaut@labri.fr</maintainer>
@@ -187,17 +235,15 @@
 								</tags>
 								<ports>
 									<port>8080</port>
-
 								</ports>
 
 								<cmd>
-									<shell>java -cp /maven/*:/maven/${project.build.finalName} fr.labri.progress.comet.app.Main --host 0.0.0.0 --port 8080 --rabbit-host $AMQP_PORT_5672_TCP_ADDR --rabbit-port $AMQP_PORT_5672_TCP_PORT</shell>
+									<shell>java -cp /maven/*:/maven/${project.build.finalName} fr.labri.progress.comet.app.Main --host 0.0.0.0 --port 8080 --rabbit-host $AMQP_PORT_5672_TCP_ADDR --rabbit-port $AMQP_PORT_5672_TCP_PORT --streamer-host $STREAMER_PORT_8081_TCP_ADDR --streamer-port $STREAMER_PORT_8081_TCP_PORT</shell>
 								</cmd>
 
 							</build>
 
 							<run>
-
 								<ports>
 									<port>localhost:8080:8080</port>
 								</ports>
@@ -205,10 +251,11 @@
 									<link>
 										broker:amqp
 									</link>
+									<link>
+										streamer
+									</link>
+
 								</links>
-
-
-
 							</run>
 						</image>
 					</images>

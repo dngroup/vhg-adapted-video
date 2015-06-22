@@ -38,7 +38,7 @@ public class Main {
 	 */
 	public static void main(String[] args) throws IOException,
 			InterruptedException {
-
+//salut
 		try {
 			CliConfiguration cliconf = CliFactory.parseArguments(
 					CliConfiguration.class, args);
