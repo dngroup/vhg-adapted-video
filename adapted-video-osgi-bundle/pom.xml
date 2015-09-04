@@ -103,6 +103,52 @@
 			</extension>
 		</extensions>
 		<plugins>
+		
+		
+			<plugin>
+				<groupId>org.jolokia</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.12.0</version>
+				<configuration>
+					<finalName>proxy.jar</finalName>
+					<images>
+						
+						
+						<image>
+							<name>nherbaut/${project.artifactId}:latest</name>
+							<alias>proxy</alias>
+
+							<build>
+								<assembly>
+									<descriptorRef>artifact-with-dependencies</descriptorRef>
+								</assembly>
+								<from>java:8-jre</from>
+								<maintainer>nherbaut@labri.fr</maintainer>
+								<tags>
+									<tag>latest</tag>
+									<tag>${project.version}</tag>
+								</tags>
+								<ports>
+									<port>8080</port>
+								</ports>
+
+								<cmd>
+									<shell>java -cp /maven/*:/maven/${project.build.finalName} fr.labri.progess.comet.app.App --frontalHostName $FRONTAL_HOSTNAME --frontalPort $FRONTAL_PORT --host 0.0.0.0 --port 8080</shell>
+								</cmd>
+
+							</build>
+
+							<run>
+								<ports>
+									<port>localhost:8080:8080</port>
+								</ports>
+								
+							</run>
+						</image>
+					</images>
+				</configuration>
+			</plugin>
+			
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.5.2</version>

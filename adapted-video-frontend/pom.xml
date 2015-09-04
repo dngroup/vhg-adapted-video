@@ -158,67 +158,12 @@
 			<plugin>
 				<groupId>org.jolokia</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.11.4-SNAPSHOT</version>
+				<version>0.12.0</version>
 				<configuration>
 					<finalName>frontend.jar</finalName>
 					<images>
-						<image>
-							<name>rabbitmq:3.5.1</name>
-							<alias>broker</alias>
-							<run>
-								<wait>
-									<time>2000</time>
-								</wait>
-								<ports>
-									<port>5672:5672</port>
-								</ports>
-							</run>
-
-						</image>
-						<image>
-							<name>httpd:latest</name>
-							<alias>streamer</alias>
-							<run>
-								<ports>
-									<port>localhost:8081:80</port>
-								</ports>
-								<volumes>
-									<bind>
-										<volume>/usr/local/apache2/htdocs</volume>
-									</bind>
-								</volumes>
-							</run>
-
-						</image>
-						<image>
-							<name>nherbaut/adaptation-worker:latest</name>
-							<alias>worker</alias>
-							<run>
-								<volumes>
-									<from>
-										<image>streamer</image>
-									</from>
-								</volumes>
-								<links>
-									<link>broker:amqp</link>
-								</links>
-							</run>
-						</image>
-						<image>
-							<name>nherbaut/adaptation-worker:latest</name>
-							<alias>worker2</alias>
-							<run>
-								<volumes>
-									<from>
-										<image>streamer</image>
-									</from>
-								</volumes>
-								<links>
-									<link>broker:amqp</link>
-								</links>
-							</run>
-						</image>
-
+						
+						
 						<image>
 							<name>nherbaut/${project.artifactId}:latest</name>
 							<alias>frontend</alias>
