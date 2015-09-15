@@ -183,7 +183,7 @@
 								</ports>
 
 								<cmd>
-									<shell>java -cp /maven/*:/maven/${project.build.finalName} fr.labri.progress.comet.app.Main --host 0.0.0.0 --port 8080 --rabbit-host $AMQP_PORT_5672_TCP_ADDR --rabbit-port $AMQP_PORT_5672_TCP_PORT --streamer-host $STREAMER_PORT_8081_TCP_ADDR --streamer-port $STREAMER_PORT_8081_TCP_PORT</shell>
+									<shell>java -cp /maven/*:/maven/${project.build.finalName} fr.labri.progress.comet.app.Main --host 0.0.0.0 --port 8080 --rabbit-host $AMQP_PORT_5672_TCP_ADDR --rabbit-port $AMQP_PORT_5672_TCP_PORT --streamer-url $STREAMER_URL </shell>
 								</cmd>
 
 							</build>

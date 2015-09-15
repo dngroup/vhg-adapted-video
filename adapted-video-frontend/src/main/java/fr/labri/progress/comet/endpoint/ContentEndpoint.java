@@ -25,6 +25,7 @@ import fr.labri.progess.comet.model.Content;
 import fr.labri.progess.comet.model.ContentWrapper;
 import fr.labri.progress.comet.conf.CliConfSingleton;
 import fr.labri.progress.comet.exception.NoNewUriException;
+import fr.labri.progress.comet.exception.UnCachableContentException;
 import fr.labri.progress.comet.service.ContentService;
 
 /**
@@ -58,22 +59,26 @@ public class ContentEndpoint {
 	@POST
 	@Consumes(MediaType.APPLICATION_XML)
 	public Response list(Content content) {
-		LOGGER.info("we need to cache {}", content.getUri());
-		contentService.addCacheRequest(content);
-		LOGGER.info("now it's known under Id {}", content.getId());
-		return Response.ok().build();
+
+		try {
+			contentService.addCacheRequest(content);
+			LOGGER.info("new content {}/{} candidate for caching",
+					content.getUri(), content.getId());
+			return Response.ok().build();
+		} catch (UnCachableContentException e) {
+			return Response.noContent().build();
+		}
+
 	}
 
 	@Path("{contentId}/{quality}")
 	@GET
-	public Response getone(@PathParam("contentId") String contentId,@PathParam("quality") String quality)
-			throws URISyntaxException {
+	public Response getone(@PathParam("contentId") String contentId,
+			@PathParam("quality") String quality) throws URISyntaxException {
 
-		URI newUri = UriBuilder
-				.fromPath(
-						"http://" + CliConfSingleton.streamerHost + ":"
-								+ CliConfSingleton.streamerPort)
-				.path(contentId).path("encoding").path(quality+".mp4").build();
+		URI newUri = UriBuilder.fromPath(CliConfSingleton.streamerBaseURL)
+				.path(contentId).path("encoding").path(quality + ".mp4")
+				.build();
 		return Response.seeOther(newUri).build();
 
 	}

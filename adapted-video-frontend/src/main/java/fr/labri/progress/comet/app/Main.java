@@ -38,7 +38,7 @@ public class Main {
 	 */
 	public static void main(String[] args) throws IOException,
 			InterruptedException {
-//salut
+		// salut
 		try {
 			CliConfiguration cliconf = CliFactory.parseArguments(
 					CliConfiguration.class, args);
@@ -47,8 +47,7 @@ public class Main {
 			CliConfSingleton.rabbitUser = cliconf.getRabbitUser();
 			CliConfSingleton.rabbitPassword = cliconf.getRabbitPassword();
 			CliConfSingleton.rabbitPort = cliconf.getRabbitPort();
-			CliConfSingleton.streamerHost = cliconf.getStreamerHost();
-			CliConfSingleton.streamerPort = cliconf.getStreamerPort();
+			CliConfSingleton.streamerBaseURL= cliconf.getStreamerUrl();
 
 			String baseHost = cliconf.getHost();
 			int pasePort = cliconf.getPort();
@@ -136,11 +135,8 @@ interface CliConfiguration {
 	@Option(longName = "rabbit-port", defaultValue = "5672")
 	Integer getRabbitPort();
 
-	@Option(longName = "streamer-port", defaultValue = "80", description = "the port on which the streamer will stream its data")
-	Integer getStreamerPort();
-
-	@Option(longName = "streamer-host", defaultValue = "streamer", description = "the host on which the streamer will stream its data")
-	String getStreamerHost();
+	@Option(longName = "streamer-url", defaultValue = "http://192.168.236.60:8080/v1/AUTH_admin/", description = "the base url of the streamer to use")
+	String getStreamerUrl();
 
 	@Option(helpRequest = true)
 	boolean getHelp();

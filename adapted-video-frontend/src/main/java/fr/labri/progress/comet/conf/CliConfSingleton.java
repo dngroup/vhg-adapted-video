@@ -11,7 +11,6 @@ public final class CliConfSingleton {
 	public static String rabbitUser;
 	public static String rabbitPassword;
 	public static Integer rabbitPort;
-	public static String streamerHost;
-	public static Integer streamerPort;
+	public static String streamerBaseURL;
 
 }
