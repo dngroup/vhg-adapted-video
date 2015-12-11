@@ -3,10 +3,18 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.labri.progress.comet</groupId>
+
 	<artifactId>adapted-video-frontend</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0-SNAPSHOT</version>
 	<name>adapted-video-frontend</name>
+
+	<parent>
+		<artifactId>adapted-video-parent</artifactId>
+		<groupId>fr.labri.progress.comet</groupId>
+		<version>1.0-SNAPSHOT</version>
+		<relativePath>../</relativePath>
+	</parent>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -158,14 +166,13 @@
 			<plugin>
 				<groupId>org.jolokia</groupId>
 				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.12.0</version>
 				<configuration>
 					<finalName>frontend.jar</finalName>
 					<images>
-						
-						
+
+
 						<image>
-							<name>nherbaut/${project.artifactId}:latest</name>
+							<name>dngroup/${project.artifactId}:latest</name>
 							<alias>frontend</alias>
 
 							<build>
@@ -235,8 +242,8 @@
 				<version>2.5.1</version>
 				<inherited>true</inherited>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>1.8</source>
+					<target>1.8</target>
 				</configuration>
 			</plugin>
 			<plugin>
