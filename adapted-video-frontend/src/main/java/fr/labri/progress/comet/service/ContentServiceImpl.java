@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
+import javax.persistence.EntityNotFoundException;
 
 import org.glassfish.grizzly.utils.Charsets;
 import org.slf4j.Logger;
@@ -46,15 +47,16 @@ public class ContentServiceImpl implements ContentService {
 			.getLogger(ContentServiceImpl.class);
 
 	@Override
-	public void addCacheRequest(Content content) throws UnCachableContentException {
+	public void addCacheRequest(Content content)
+			throws UnCachableContentException {
 
-		if (!repo.findByOldUri(content.getUri()).isEmpty()) {
-			LOGGER.info("already have a video transcoding for this URI, but it's not ready");
-			return;
-		}
+		// if (!repo.findByOldUri(content.getUri()).isEmpty()) {
+
+		// return;
+		// }
 		URI contentUri;
 		try {
-			contentUri = new URI(content.getUri());
+			contentUri = new URI(content.getUri()).normalize();
 			if (contentUri.toString()
 					.contains(CliConfSingleton.streamerBaseURL)) {
 				LOGGER.debug("Streamer delivered video are not cached");
@@ -67,13 +69,21 @@ public class ContentServiceImpl implements ContentService {
 		}
 
 		CachedContent cachedContent = CachedContent.fromContent(content);
-		
-		HashCode hash = Hashing.sha1().hashString(contentUri.normalize().toASCIIString(),Charsets.ASCII_CHARSET );
+
+		HashCode hash = Hashing.sha1().hashString(contentUri.toASCIIString(),
+				Charsets.ASCII_CHARSET);
 		cachedContent.setId(hash.toString());
-		repo.save(cachedContent);
-		workerMessageService.sendDownloadOrder(cachedContent.getOldUri()
-				.toString(), cachedContent.getId());
-		content.setId(cachedContent.getId());
+
+		if (repo.findOne(cachedContent.getId()) != null) {
+			LOGGER.info(
+					"already have a video transcoding for this URI {}  id: {}",
+					cachedContent.getOldUri(), cachedContent.getId());
+		} else {
+			repo.save(cachedContent);
+			workerMessageService.sendDownloadOrder(cachedContent.getOldUri()
+					.toString(), cachedContent.getId());
+			content.setId(cachedContent.getId());
+		}
 
 	}
 

@@ -1,19 +1,15 @@
 package fr.labri.progress.comet.model;
 
 import java.io.Serializable;
-import java.lang.String;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-import javax.persistence.*;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
 
-import org.springframework.data.repository.cdi.Eager;
-
-import jersey.repackaged.com.google.common.base.Throwables;
 import fr.labri.progess.comet.model.Content;
 
 /**

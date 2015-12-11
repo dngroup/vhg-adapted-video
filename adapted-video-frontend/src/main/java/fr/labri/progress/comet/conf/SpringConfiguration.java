@@ -85,4 +85,9 @@ public class SpringConfiguration {
 		return Persistence.createEntityManagerFactory("cache-orchestrator");
 	}
 
+//	@Bean
+//	public ObjectMapper mapper() {
+//		return new ObjectMapper();
+//	}
+
 }

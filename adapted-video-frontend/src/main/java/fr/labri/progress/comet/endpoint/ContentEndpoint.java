@@ -61,9 +61,10 @@ public class ContentEndpoint {
 	public Response list(Content content) {
 
 		try {
+			LOGGER.trace("new content {} candidate for caching",
+					content.getUri() );
 			contentService.addCacheRequest(content);
-			LOGGER.info("new content {}/{} candidate for caching",
-					content.getUri(), content.getId());
+			
 			return Response.ok().build();
 		} catch (UnCachableContentException e) {
 			return Response.noContent().build();
