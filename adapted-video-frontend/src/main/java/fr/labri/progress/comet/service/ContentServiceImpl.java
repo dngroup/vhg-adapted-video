@@ -2,6 +2,7 @@ package fr.labri.progress.comet.service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.inject.Inject;
 
+import org.glassfish.grizzly.utils.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -21,6 +23,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
 
 import fr.labri.progess.comet.model.Content;
 import fr.labri.progress.comet.conf.CliConfSingleton;
@@ -59,10 +63,13 @@ public class ContentServiceImpl implements ContentService {
 		} catch (URISyntaxException e) {
 			LOGGER.warn("invalid URI is ignored by frontal {}",
 					content.getUri(), e);
+			return;
 		}
 
 		CachedContent cachedContent = CachedContent.fromContent(content);
-		cachedContent.setId(UUID.randomUUID().toString().replace("-", ""));
+		
+		HashCode hash = Hashing.sha1().hashString(contentUri.normalize().toASCIIString(),Charsets.ASCII_CHARSET );
+		cachedContent.setId(hash.toString());
 		repo.save(cachedContent);
 		workerMessageService.sendDownloadOrder(cachedContent.getOldUri()
 				.toString(), cachedContent.getId());
