@@ -165,11 +165,13 @@ public class DummyTEst {
 	
 	@Inject
 	WorkerMessageServiceImpl workerMessageServiceImpl;
+	
+	//this test do nothing
 	@Test
 	public void WorkerMessageServiceTest(){
 		String id= "a1a1";
 		String uri="http://video/";
-		workerMessageServiceImpl.sendTranscodeOrder(uri, id);
+//		workerMessageServiceImpl.sendTranscodeOrder(uri, id);
 		
 	}
 	

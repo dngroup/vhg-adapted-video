@@ -158,10 +158,11 @@
 
 		</dependency>
 		
+	<!-- need this for test with spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
-			
+			<scope>test</scope>
 		</dependency>
 
 
