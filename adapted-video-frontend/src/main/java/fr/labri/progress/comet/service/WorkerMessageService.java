@@ -9,6 +9,4 @@ public interface WorkerMessageService {
 	public void setupResultQueue();
 
 
-//	public void getHardQueue();
-
 }

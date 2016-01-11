@@ -2,9 +2,6 @@ package fr.labri.progress.comet.service;
 
 import java.sql.Date;
 import java.util.Collections;
-import java.util.Properties;
-import java.util.Random;
-import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -19,13 +16,11 @@ import org.springframework.amqp.rabbit.core.ChannelAwareMessageListener;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.amqp.support.converter.SimpleMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ErrorHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rabbitmq.client.AMQP.Queue;
 import com.rabbitmq.client.Channel;
 
 import fr.labri.progress.comet.model.CachedContent;
@@ -57,14 +52,22 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 	@Inject
 	ObjectMapper mapper;
 
+	private static final String TASK = "adaptation.commons.staging_and_admission_workflow";
+
 	private static final MessageProperties props = new MessageProperties();
 
-	private static final String h264 = "H264";
-	private static final String h265 = "H265";
-//	private static final String hardx264 = "h264-gpu";
-//	private static final String hardx265 = "h265-gpu";
-//	private static final String hardQueue = "hard";
-//	private static final String softQueue = "soft";
+	public enum Encoder { 
+		H264("h264"), H265("h265");
+		private String name = "";
+
+		Encoder(String name) {
+			this.name = name;
+		}
+
+		public String toString() {
+			return name;
+		}
+	}
 
 	{
 		props.setContentType("application/json");
@@ -87,29 +90,15 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 		kwargs.setUrl(uri);
 
 		Qualities qualities;
-//		Random random = new Random();
-//		if (random.nextBoolean()) {
-//			transcode.setTask("adaptation.commons.encode_workflow");
-//			qualities = getSoftQuality();
-//			template.setRoutingKey(softQueue);
-//		} else {
-			transcode.setTask("adaptation.commons.staging_and_admission_workflow");
-			qualities = getQuality();
-//			template.setRoutingKey(hardQueue);
-//		}
+
+		transcode.setTask(TASK);
+		qualities = getQuality();
+
 		kwargs.setQualities(qualities);
 		transcode.setKwargs(kwargs);
 
 		String message = transcode.toJSON();
 
-		// String message = "{\"id\": \""
-		// + id
-		// +
-		// "\", \"task\": \"adaptation.commons.encode_workflow\", \"args\": [\""
-		// + uri
-		// + "\"], \"kwargs\": {}, \"retries\": 0, \"eta\": \""
-		// + ISODateTimeFormat.dateTimeNoMillis().print(
-		// DateTime.now().minusHours(200)) + "\"}";
 
 		Message amqpMessage = new Message(message.getBytes(), props);
 
@@ -125,41 +114,20 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 
 		Quality quality = new Quality();
 		quality.setBitrate(2000);
-		quality.setCodec(h264);
+		quality.setCodec(Encoder.H264.toString());
 		quality.setHeight(720);
 		quality.setName("720px264");
 		qualities.addQuality(quality);
 
 		Quality qualityx265 = new Quality();
 		qualityx265.setBitrate(250);
-		qualityx265.setCodec(h265);
+		qualityx265.setCodec(Encoder.H265.toString());
 		qualityx265.setHeight(320);
 		qualityx265.setName("320px265");
 		qualities.addQuality(qualityx265);
 		return qualities;
 	}
 
-//	/**
-//	 * @return qualities
-//	 */
-//	private Qualities getHardQuality() {
-//		Qualities qualities = new Qualities();
-//
-//		Quality quality = new Quality();
-//		quality.setBitrate(2000);
-//		quality.setCodec(hardx264);
-//		quality.setHeight(720);
-//		quality.setName("720px264");
-//		qualities.addQuality(quality);
-//
-//		Quality qualityx265 = new Quality();
-//		qualityx265.setBitrate(250);
-//		qualityx265.setCodec(hardx265);
-//		qualityx265.setHeight(320);
-//		qualityx265.setName("320px265");
-//		qualities.addQuality(qualityx265);
-//		return qualities;
-//	}
 
 	@Override
 	public void setupResultQueue() {
@@ -221,12 +189,5 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 		container.start();
 	}
 
-//	@Override
-//	public void getHardQueue() {
-//		Properties queue = admin.getQueueProperties(hardQueue);
-//		Set<Object> temp = queue.keySet();
-//		String size = queue.getProperty("QUEUE_MESSAGE_COUNT");
-//
-//	}
 
 }
