@@ -1,6 +1,8 @@
-import java.io.IOException;
-import java.io.StringReader;
 
+
+import java.io.IOException;
+
+import javax.inject.Inject;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -8,22 +10,83 @@ import javax.xml.bind.Unmarshaller;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 
+import fr.labri.progress.comet.conf.CliConfSingleton;
 import fr.labri.progress.comet.model.jackson.Kwargs;
 import fr.labri.progress.comet.model.jackson.Qualities;
 import fr.labri.progress.comet.model.jackson.Quality;
 import fr.labri.progress.comet.model.jackson.Transcode;
+import fr.labri.progress.comet.repository.CachedContentRepository;
 import fr.labri.progress.comet.service.WorkerMessage;
 import fr.labri.progress.comet.service.WorkerMessageServiceImpl;
 
+@Configuration
+class DummyTEstConfig {
+
+	@Bean
+	@Inject
+	public RabbitAdmin getAdmin(ConnectionFactory cf) {
+		return new RabbitAdmin(cf);
+	}
+
+	@Bean
+	public ConnectionFactory connectionFactory() {
+		CachingConnectionFactory connectionFactory = new CachingConnectionFactory("localhost");
+		connectionFactory.setUsername("guest");
+		connectionFactory.setPassword("guest");
+		connectionFactory.setPort(5672);
+
+		return connectionFactory;
+	}
+
+	@Bean
+	@Inject
+	public RabbitTemplate rabbitTemplate(ConnectionFactory cf) {
+		RabbitTemplate template = new RabbitTemplate(cf);
+		
+		template.setEncoding("utf-8");
+
+		return template;
+	}
+	
+	
+
+	@Bean
+	public WorkerMessageServiceImpl workerMessageServiceImpl() {
+		return new WorkerMessageServiceImpl();
+	}
+	
+	@Bean
+	public CachedContentRepository repo(){
+		return null;
+	}
+
+	@Bean
+	public ObjectMapper mapper(){
+		return null;
+	}
+
+}
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(loader = AnnotationConfigContextLoader.class, classes = { DummyTEstConfig.class })
 public class DummyTEst {
 
 	@Test
@@ -99,4 +162,23 @@ public class DummyTEst {
 		
 		System.out.println(message);
 	}
+	
+	@Inject
+	WorkerMessageServiceImpl workerMessageServiceImpl;
+	@Test
+	public void WorkerMessageServiceTest(){
+		String id= "a1a1";
+		String uri="http://video/";
+		workerMessageServiceImpl.sendTranscodeOrder(uri, id);
+		
+	}
+	
+//	@Test
+//	public void testGetQueueSize(){
+//	
+//		workerMessageServiceImpl.getHardQueue();
+//		
+//	}
+	
+	
 }

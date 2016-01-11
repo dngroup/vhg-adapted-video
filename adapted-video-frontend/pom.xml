@@ -157,6 +157,13 @@
 			<artifactId>log4j-over-slf4j</artifactId>
 
 		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			
+		</dependency>
+
 
 	</dependencies>
 	<build>
@@ -190,7 +197,10 @@
 								</ports>
 
 								<cmd>
-									<shell>java -cp /maven/*:/maven/${project.build.finalName} fr.labri.progress.comet.app.Main --host 0.0.0.0 --port 8080 --rabbit-host $AMQP_PORT_5672_TCP_ADDR --rabbit-port $AMQP_PORT_5672_TCP_PORT --streamer-url $STREAMER_URL </shell>
+									<shell>java -cp /maven/*:/maven/${project.build.finalName}
+										fr.labri.progress.comet.app.Main --host 0.0.0.0 --port 8080
+										--rabbit-host $AMQP_PORT_5672_TCP_ADDR --rabbit-port
+										$AMQP_PORT_5672_TCP_PORT --streamer-url $STREAMER_URL </shell>
 								</cmd>
 
 							</build>

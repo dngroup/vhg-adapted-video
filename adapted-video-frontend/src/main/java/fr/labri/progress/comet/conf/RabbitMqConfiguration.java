@@ -1,5 +1,7 @@
 package fr.labri.progress.comet.conf;
 
+import java.util.Collections;
+
 import javax.inject.Inject;
 
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -17,7 +19,13 @@ public class RabbitMqConfiguration {
 	@Bean
 	@Inject
 	public RabbitAdmin getAdmin(ConnectionFactory cf) {
-		return new RabbitAdmin(cf);
+		RabbitAdmin admin = new RabbitAdmin(cf);
+//		admin.declareQueue(new org.springframework.amqp.core.Queue("soft",
+//				true, false, false, Collections.EMPTY_MAP));
+//		admin.declareQueue(new org.springframework.amqp.core.Queue("hard",
+//				true, false, false, Collections.EMPTY_MAP));
+		
+		return admin;
 	}
 
 	@Bean
@@ -35,7 +43,8 @@ public class RabbitMqConfiguration {
 	@Inject
 	public RabbitTemplate rabbitTemplate(ConnectionFactory cf) {
 		RabbitTemplate template = new RabbitTemplate(cf);
-		template.setRoutingKey(this.celeryQueueName);
+		
+		template.setRoutingKey(celeryQueueName);
 		template.setEncoding("utf-8");
 
 		return template;
