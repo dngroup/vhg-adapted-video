@@ -17,7 +17,8 @@ public class RabbitMqConfiguration {
 	@Bean
 	@Inject
 	public RabbitAdmin getAdmin(ConnectionFactory cf) {
-		return new RabbitAdmin(cf);
+		RabbitAdmin admin = new RabbitAdmin(cf);
+		return admin;
 	}
 
 	@Bean

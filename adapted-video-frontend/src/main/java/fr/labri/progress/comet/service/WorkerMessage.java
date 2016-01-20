@@ -22,7 +22,15 @@ public class WorkerMessage {
 	public void setComplete(Boolean complete) {
 		this.complete = complete;
 	}
+	
 	String quality;
 	String main_task_id;
 	Boolean complete;
+	String md5;
+	public String getMd5() {
+		return md5;
+	}
+	public void setMd5(String md5) {
+		this.md5 = md5;
+	}
 }

@@ -16,13 +16,11 @@ import org.springframework.amqp.rabbit.core.ChannelAwareMessageListener;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.amqp.support.converter.SimpleMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ErrorHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rabbitmq.client.AMQP.Queue;
 import com.rabbitmq.client.Channel;
 
 import fr.labri.progress.comet.model.CachedContent;
@@ -54,7 +52,22 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 	@Inject
 	ObjectMapper mapper;
 
+	private static final String TASK = "adaptation.commons.staging_and_admission_workflow";
+
 	private static final MessageProperties props = new MessageProperties();
+
+	public enum Encoder { 
+		H264("h264"), H265("h265");
+		private String name = "";
+
+		Encoder(String name) {
+			this.name = name;
+		}
+
+		public String toString() {
+			return name;
+		}
+	}
 
 	{
 		props.setContentType("application/json");
@@ -63,52 +76,58 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 	}
 
 	@Override
-	public void sendDownloadOrder(final String uri, final String id) {
-		
+	public void sendTranscodeOrder(final String uri, final String id) {
 
 		LOGGER.info("download order for id {}", id);
-		
+
 		Transcode transcode = new Transcode();
 		transcode.setId(id);
 		transcode.setEta(ISODateTimeFormat.dateTimeNoMillis().print(
-						DateTime.now().minusHours(200)));
+				DateTime.now().minusHours(200)));
 		transcode.setRetries(1);
-		transcode.setTask("adaptation.commons.encode_workflow");
+
 		Kwargs kwargs = new Kwargs();
 		kwargs.setUrl(uri);
-		Qualities qualities = new Qualities();
-		
-		Quality quality = new Quality();
-		quality.setBitrate(2000);
-		quality.setCodec("libx264");
-		quality.setHeight(720);
-		quality.setName("720px264");
-		qualities.addQuality(quality );
-		
-		Quality qualityx265 = new Quality();
-		qualityx265.setBitrate(250);
-		qualityx265.setCodec("libx265");
-		qualityx265.setHeight(320);
-		qualityx265.setName("320px265");
-		qualities.addQuality(qualityx265 );
-		
-		kwargs.setQualities(qualities );
-		transcode.setKwargs(kwargs );
-		
+
+		Qualities qualities;
+
+		transcode.setTask(TASK);
+		qualities = getQuality();
+
+		kwargs.setQualities(qualities);
+		transcode.setKwargs(kwargs);
+
 		String message = transcode.toJSON();
-		
-//		String message = "{\"id\": \""
-//				+ id
-//				+ "\", \"task\": \"adaptation.commons.encode_workflow\", \"args\": [\""
-//				+ uri
-//				+ "\"], \"kwargs\": {}, \"retries\": 0, \"eta\": \""
-//				+ ISODateTimeFormat.dateTimeNoMillis().print(
-//						DateTime.now().minusHours(200)) + "\"}";
+
 
 		Message amqpMessage = new Message(message.getBytes(), props);
+
 		template.send(amqpMessage);
 
 	}
+
+	/**
+	 * @return qualities
+	 */
+	private Qualities getQuality() {
+		Qualities qualities = new Qualities();
+
+		Quality quality = new Quality();
+		quality.setBitrate(2000);
+		quality.setCodec(Encoder.H264.toString());
+		quality.setHeight(720);
+		quality.setName("720px264");
+		qualities.addQuality(quality);
+
+		Quality qualityx265 = new Quality();
+		qualityx265.setBitrate(250);
+		qualityx265.setCodec(Encoder.H265.toString());
+		qualityx265.setHeight(320);
+		qualityx265.setName("320px265");
+		qualities.addQuality(qualityx265);
+		return qualities;
+	}
+
 
 	@Override
 	public void setupResultQueue() {
@@ -140,7 +159,7 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 						content.setCreatedAt(new Date(System
 								.currentTimeMillis()));
 					}
-					
+
 					repo.save(content);
 				} else {
 					LOGGER.warn(
@@ -159,7 +178,9 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 
 			@Override
 			public void handleError(Throwable t) {
-				LOGGER.warn("error received while using rabbitmq container, trying to redeclare the queue");
+				LOGGER.warn(
+						"error received while using rabbitmq container, trying to redeclare the queue",
+						t);
 				admin.declareQueue(new org.springframework.amqp.core.Queue(
 						RESULTQUEUE, true, false, false, Collections.EMPTY_MAP));
 
@@ -167,4 +188,6 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 		});
 		container.start();
 	}
+
+
 }

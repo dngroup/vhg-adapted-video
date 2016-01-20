@@ -32,6 +32,8 @@ import fr.labri.progress.comet.conf.CliConfSingleton;
 import fr.labri.progress.comet.exception.NoNewUriException;
 import fr.labri.progress.comet.exception.UnCachableContentException;
 import fr.labri.progress.comet.model.CachedContent;
+import fr.labri.progress.comet.model.jackson.Qualities;
+import fr.labri.progress.comet.model.jackson.Quality;
 import fr.labri.progress.comet.repository.CachedContentRepository;
 
 @Service
@@ -80,7 +82,8 @@ public class ContentServiceImpl implements ContentService {
 					cachedContent.getOldUri(), cachedContent.getId());
 		} else {
 			repo.save(cachedContent);
-			workerMessageService.sendDownloadOrder(cachedContent.getOldUri()
+
+			workerMessageService.sendTranscodeOrder(cachedContent.getOldUri()
 					.toString(), cachedContent.getId());
 			content.setId(cachedContent.getId());
 		}
