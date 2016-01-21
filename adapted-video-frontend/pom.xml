@@ -157,6 +157,14 @@
 			<artifactId>log4j-over-slf4j</artifactId>
 
 		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-json-jettison</artifactId>
+		</dependency>
+
+
+		
 		
 	<!-- need this for test with spring -->
 		<dependency>
@@ -244,6 +252,7 @@
 					</descriptorRefs>
 				</configuration>
 			</plugin>
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -269,6 +278,41 @@
 					<mainClass>fr.labri.progress.comet.app.Main</mainClass>
 				</configuration>
 			</plugin>
+			
+			<plugin>
+       				<groupId>org.apache.maven.plugins</groupId>
+			        <artifactId>maven-dependency-plugin</artifactId>
+			        <version>2.10</version>
+			        <executions>
+			          <execution>
+			            <id>copy</id>
+			            <phase>package</phase>
+			            <goals>
+			              <goal>copy</goal>
+			            </goals>
+			            <configuration>
+			              <artifactItems>
+			                <artifactItem>
+			                  <groupId>${project.groupId} </groupId>
+			                  <artifactId>${project.artifactId}</artifactId>
+			                  <version>${project.version}</version>
+								 <classifier>jar-with-dependencies</classifier>
+			                  <type>jar</type>
+			                  <overWrite>false</overWrite>
+			                  <outputDirectory>${project.build.directory}/../docker/</outputDirectory>
+			                  <destFileName>${project.artifactId}.jar</destFileName>
+			                  
+			                </artifactItem>
+			              </artifactItems>
+			              <outputDirectory>${project.build.directory}/wars</outputDirectory>
+			              <overWriteReleases>false</overWriteReleases>
+			              <overWriteSnapshots>true</overWriteSnapshots>
+			            </configuration>
+			          </execution>
+			        </executions>
+			      </plugin>
+
+      
 		</plugins>
 	</build>
 	<properties>

@@ -1,5 +1,6 @@
 package fr.labri.progress.comet.endpoint;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -55,10 +56,18 @@ public class ContentEndpoint {
 		wrapper.setContents(Lists.newArrayList(contentService.getCache()));
 		return wrapper;
 	}
+	
+	@GET
+	@Path("{contentId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Content getStatusEntity(@PathParam("contentId") String contentId) {
+		Content content = contentService.getContent(contentId);
+		return content;
+	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_XML)
-	public Response list(Content content) {
+	public Response postContent(Content content) {
 
 		try {
 			LOGGER.trace("new content {} candidate for caching",
@@ -83,4 +92,17 @@ public class ContentEndpoint {
 		return Response.seeOther(newUri).build();
 
 	}
+	@Path("{contentId}/{quality}")
+	@POST
+	public Response postfile(@PathParam("contentId") String contentId,
+			@PathParam("quality") String quality, InputStream is) throws URISyntaxException {
+
+		URI newUri = UriBuilder.fromPath("http://"+ CliConfSingleton.storageHostname+":8079/api/storage")
+				.path(contentId).path(quality + ".mp4")
+				.build();
+		LOGGER.debug("redirect to {}",newUri.toString());
+		return Response.temporaryRedirect(newUri).build();
+
+	}
+	
 }

@@ -2,6 +2,7 @@ package fr.labri.progress.comet.conf;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.spring.scope.RequestContextFilter;
+import org.glassfish.jersey.jettison.JettisonFeature;
 
 import fr.labri.progress.comet.endpoint.ConfigurationEndpoint;
 import fr.labri.progress.comet.endpoint.ContentEndpoint;
@@ -22,7 +23,9 @@ public class RestConfiguration extends ResourceConfig {
 		register(ContentEndpoint.class);
 		register(ConfigurationEndpoint.class);
 		register(StatisticsTest.class);
-		
+//		register(ThridPartyStorageEndPoint.class);
+		register(JettisonFeature.class);
+
 
 		// tell were to find resources
 		// this.packages("fr.labri.progress.comet.endpoint");

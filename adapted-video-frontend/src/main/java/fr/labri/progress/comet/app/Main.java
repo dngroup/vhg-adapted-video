@@ -48,7 +48,13 @@ public class Main {
 			CliConfSingleton.rabbitPassword = cliconf.getRabbitPassword();
 			CliConfSingleton.rabbitPort = cliconf.getRabbitPort();
 			CliConfSingleton.streamerBaseURL= cliconf.getStreamerUrl();
-
+			CliConfSingleton.frontendPort= cliconf.getPort();
+//			if (cliconf.getExternalAddr()!=null){
+//			CliConfSingleton.externalAddr= cliconf.getExternalAddr();
+//			}
+//			else {
+//				CliConfSingleton.externalAddr=  "http://"+cliconf.getHost()+":"+cliconf.getPort();
+//			}
 			String baseHost = cliconf.getHost();
 			int pasePort = cliconf.getPort();
 
@@ -120,7 +126,7 @@ interface CliConfiguration {
 	@Option(shortName = "p", longName = "port", defaultValue = "8080", description = "the port on which the frontend will listen for http connections")
 	Integer getPort();
 
-	@Option(shortName = "h", longName = "host", defaultValue = "localhost", description = "the hostname or IP on which the frontend will listen for http connections")
+	@Option(shortName = "h", longName = "host", defaultValue = "0.0.0.0", description = "the hostname or IP on which the frontend will listen for http connections")
 	String getHost();
 
 	@Option(longName = "rabbit-host", defaultValue = "localhost")
@@ -137,6 +143,9 @@ interface CliConfiguration {
 
 	@Option(longName = "streamer-url", defaultValue = "http://192.168.236.60:8080/v1/AUTH_admin/", description = "the base url of the streamer to use")
 	String getStreamerUrl();
+	
+//	@Option(longName = "external-addr",defaultToNull=true,description="The Frontend address for the workers")
+//	String getExternalAddr();
 
 	@Option(helpRequest = true)
 	boolean getHelp();

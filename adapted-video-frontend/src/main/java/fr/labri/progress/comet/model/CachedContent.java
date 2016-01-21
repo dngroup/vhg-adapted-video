@@ -23,6 +23,8 @@ public class CachedContent implements Serializable {
 
 	@Id
 	private String id;
+	//	TODO: this flow ligne is for get time to transcode
+	private Date requestDate;
 	private Date createdAt;
 	private Date validTo;
 	@ElementCollection(targetClass = String.class, fetch=FetchType.EAGER)
@@ -83,10 +85,13 @@ public class CachedContent implements Serializable {
 		Content c = new Content();
 		if (content.createdAt != null)
 			c.setCreated(new Date(content.createdAt.getTime()));
+		else if (content.requestDate != null)
+			c.setCreated(new Date(content.requestDate.getTime()));
+
 		c.setId(content.getId());
 		if (content.getOldUri() != null)
 			c.setUri(content.getOldUri());
-
+		
 		c.getQualities().clear();
 		c.getQualities().addAll(content.getQualities());
 		return c;
@@ -99,6 +104,20 @@ public class CachedContent implements Serializable {
 
 	public void setQualities(List<String> qualities) {
 		this.qualities = qualities;
+	}
+
+	/**
+	 * @return the requestDate
+	 */
+	public Date getRequestDate() {
+		return requestDate;
+	}
+
+	/**
+	 * @param requestDate the requestDate to set
+	 */
+	public void setRequestDate(Date requestDate) {
+		this.requestDate = requestDate;
 	}
 
 }

@@ -2,38 +2,23 @@ package fr.labri.progress.comet.service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
+import java.sql.Date;
 import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 import javax.inject.Inject;
-import javax.persistence.EntityNotFoundException;
-
 import org.glassfish.grizzly.utils.Charsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 
 import fr.labri.progess.comet.model.Content;
 import fr.labri.progress.comet.conf.CliConfSingleton;
-import fr.labri.progress.comet.exception.NoNewUriException;
 import fr.labri.progress.comet.exception.UnCachableContentException;
 import fr.labri.progress.comet.model.CachedContent;
-import fr.labri.progress.comet.model.jackson.Qualities;
-import fr.labri.progress.comet.model.jackson.Quality;
 import fr.labri.progress.comet.repository.CachedContentRepository;
 
 @Service
@@ -69,18 +54,20 @@ public class ContentServiceImpl implements ContentService {
 					content.getUri(), e);
 			return;
 		}
-
+	
 		CachedContent cachedContent = CachedContent.fromContent(content);
-
-		HashCode hash = Hashing.sha1().hashString(contentUri.toASCIIString(),
-				Charsets.ASCII_CHARSET);
-		cachedContent.setId(hash.toString());
+		if (cachedContent.getId() == null) {
+			HashCode hash = Hashing.sha1().hashString(
+					contentUri.toASCIIString(), Charsets.ASCII_CHARSET);
+			cachedContent.setId(hash.toString());
+		}
 
 		if (repo.findOne(cachedContent.getId()) != null) {
 			LOGGER.info(
 					"already have a video transcoding for this URI {}  id: {}",
 					cachedContent.getOldUri(), cachedContent.getId());
 		} else {
+			cachedContent.setRequestDate( new Date(System.currentTimeMillis()));
 			repo.save(cachedContent);
 
 			workerMessageService.sendTranscodeOrder(cachedContent.getOldUri()
@@ -102,6 +89,12 @@ public class ContentServiceImpl implements ContentService {
 					}
 				});
 
+	}
+
+	@Override
+	public Content getContent(String id) {
+		return CachedContent.toContent(repo.findOne(id));
+	
 	}
 
 }

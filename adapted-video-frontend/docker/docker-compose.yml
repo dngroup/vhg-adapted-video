@@ -1,0 +1,8 @@
+test:
+  image: ubuntu
+  command: /bin/bash -c "ping $QUEUE"
+  environment:
+  - QUEUE=www.google.fr
+  - PYTHONUNBUFFERED=1
+  - CELERY_BROKER_URL=amqp://guest@rabbitmq/
+
