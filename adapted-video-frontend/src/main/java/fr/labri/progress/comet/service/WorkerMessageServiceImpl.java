@@ -120,28 +120,28 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 		h264_soft.setBitrate(2000);
 		h264_soft.setCodec(Encoder.H264SOFT.toString());
 		h264_soft.setHeight(720);
-		h264_soft.setName("H264SOFT");
+		h264_soft.setName(Encoder.H264SOFT.toString());
 		qualities.addQuality(h264_soft);
 
 		Quality h265_soft = new Quality();
 		h265_soft.setBitrate(2000);
 		h265_soft.setCodec(Encoder.H265SOFT.toString());
 		h265_soft.setHeight(720);
-		h265_soft.setName("H265SOFT");
+		h265_soft.setName(Encoder.H265SOFT.toString());
 		qualities.addQuality(h265_soft);
 		
 		Quality h264_hard = new Quality();
 		h264_hard.setBitrate(2000);
 		h264_hard.setCodec(Encoder.H264HARD.toString());
 		h264_hard.setHeight(720);
-		h264_hard.setName("H264SOFT");
+		h264_hard.setName(Encoder.H264HARD.toString());
 		qualities.addQuality(h264_hard);
 
 		Quality h265_hard = new Quality();
 		h265_hard.setBitrate(2000);
 		h265_hard.setCodec(Encoder.H265HARD.toString());
 		h265_hard.setHeight(720);
-		h265_hard.setName("H265SOFT");
+		h265_hard.setName(Encoder.H265HARD.toString());
 		qualities.addQuality(h265_hard);
 		
 		return qualities;
