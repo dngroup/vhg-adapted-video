@@ -60,7 +60,7 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 	private static final MessageProperties props = new MessageProperties();
 
 	public enum Encoder { 
-		H264("h264"), H265("h265"),H264SOFT("SOFTh264"), H265SOFT("SOFTh265"),H264HARD("HARDh264"), H265HARD("HARDh265");
+		H264("H264"), H265("H265"),H264SOFT("SOFT_H264"), H265SOFT("SOFT_H265"),H264HARD("HARD_H264"), H265HARD("HARD_H265");
 		private String name = "";
 
 		Encoder(String name) {
@@ -115,32 +115,32 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 	 */
 	private Qualities getQuality() {
 		Qualities qualities = new Qualities();
-
+		TranscodageProperties transcodageProperties=new TranscodageProperties();
 		Quality h264_soft = new Quality();
-		h264_soft.setBitrate(2000);
+		h264_soft.setBitrate(transcodageProperties.H264_SOFT_BITRATE);
 		h264_soft.setCodec(Encoder.H264SOFT.toString());
-		h264_soft.setHeight(720);
+		h264_soft.setHeight(transcodageProperties.H264_SOFT_HEIGHT);
 		h264_soft.setName(Encoder.H264SOFT.toString());
 		qualities.addQuality(h264_soft);
 
 		Quality h265_soft = new Quality();
-		h265_soft.setBitrate(2000);
+		h265_soft.setBitrate(transcodageProperties.H265_SOFT_BITRATE);
 		h265_soft.setCodec(Encoder.H265SOFT.toString());
-		h265_soft.setHeight(720);
+		h265_soft.setHeight(transcodageProperties.H265_SOFT_HEIGHT);
 		h265_soft.setName(Encoder.H265SOFT.toString());
 		qualities.addQuality(h265_soft);
 		
 		Quality h264_hard = new Quality();
-		h264_hard.setBitrate(2000);
+		h264_hard.setBitrate(transcodageProperties.H264_HARD_BITRATE);
 		h264_hard.setCodec(Encoder.H264HARD.toString());
-		h264_hard.setHeight(720);
+		h264_hard.setHeight(transcodageProperties.H264_HARD_HEIGHT);
 		h264_hard.setName(Encoder.H264HARD.toString());
 		qualities.addQuality(h264_hard);
 
 		Quality h265_hard = new Quality();
-		h265_hard.setBitrate(2000);
+		h265_hard.setBitrate(transcodageProperties.H265_HARD_BITRATE);
 		h265_hard.setCodec(Encoder.H265HARD.toString());
-		h265_hard.setHeight(720);
+		h265_hard.setHeight(transcodageProperties.H265_HARD_HEIGHT);
 		h265_hard.setName(Encoder.H265HARD.toString());
 		qualities.addQuality(h265_hard);
 		

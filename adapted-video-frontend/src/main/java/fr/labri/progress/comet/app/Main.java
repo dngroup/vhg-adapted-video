@@ -19,6 +19,7 @@ import com.lexicalscope.jewel.cli.Option;
 
 import fr.labri.progress.comet.conf.CliConfSingleton;
 import fr.labri.progress.comet.conf.SpringConfiguration;
+import fr.labri.progress.comet.service.TranscodageProperties;
 
 /**
  * Main class.
@@ -49,6 +50,7 @@ public class Main {
 			CliConfSingleton.rabbitPort = cliconf.getRabbitPort();
 			CliConfSingleton.streamerBaseURL= cliconf.getStreamerUrl();
 			CliConfSingleton.frontendPort= cliconf.getPort();
+			
 //			if (cliconf.getExternalAddr()!=null){
 //			CliConfSingleton.externalAddr= cliconf.getExternalAddr();
 //			}

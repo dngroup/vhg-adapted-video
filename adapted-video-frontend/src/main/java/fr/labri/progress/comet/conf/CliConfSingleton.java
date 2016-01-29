@@ -7,6 +7,7 @@ package fr.labri.progress.comet.conf;
  *
  */
 public final class CliConfSingleton {
+	public static String TranscodageFile = System.getenv().get("TRANSCOD_PARAM_FILE");
 	public static String rabbitHost;
 	public static String rabbitUser;
 	public static String rabbitPassword;
