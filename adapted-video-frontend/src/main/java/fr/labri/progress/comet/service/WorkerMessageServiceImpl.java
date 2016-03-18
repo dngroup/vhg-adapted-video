@@ -1,11 +1,10 @@
 package fr.labri.progress.comet.service;
 
-import java.net.URI;
+import java.net.URL;
 import java.sql.Date;
 import java.util.Collections;
 
 import javax.inject.Inject;
-import javax.ws.rs.core.UriBuilder;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
@@ -19,13 +18,13 @@ import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.support.converter.SimpleMessageConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ErrorHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 
-import fr.labri.progress.comet.conf.CliConfSingleton;
 import fr.labri.progress.comet.model.CachedContent;
 import fr.labri.progress.comet.model.jackson.Kwargs;
 import fr.labri.progress.comet.model.jackson.Qualities;
@@ -52,12 +51,20 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 	@Inject
 	volatile CachedContentRepository repo;
 
+	@Autowired
+	SwiftService swiftService;
+	
 	@Inject
 	ObjectMapper mapper;
+	
+	@Inject
+	TranscodageProperties transcodageProperties;
 
 	private static final String TASK = "adaptation.commons.staging_and_admission_workflow";
 
 	private static final MessageProperties props = new MessageProperties();
+
+	private static final String key = "azerty";
 
 	public enum Encoder { 
 		H264("H264"), H265("H265"),H264SOFT("SOFT_H264"), H265SOFT("SOFT_H265"),H264HARD("HARD_H264"), H265HARD("HARD_H265");
@@ -88,8 +95,9 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 		transcode.setEta(ISODateTimeFormat.dateTimeNoMillis().print(
 				DateTime.now().minusHours(200)));
 		transcode.setRetries(1);
-		URI urireturn = UriBuilder.fromUri("http://"+CliConfSingleton.frontendHostname).port(CliConfSingleton.frontendPort).path("api").path("content").path(id).build();
-		transcode.setReturnAddr(urireturn.toString());
+		//TODO:uncomment Follow line
+//		swiftService.InitSecretKeys();
+		transcode.setReturnAddr(swiftService.GenerateReturnURI("Original",id).toString());
 		Kwargs kwargs = new Kwargs();
 		kwargs.setUrl(uri);
 
@@ -97,7 +105,13 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 
 		transcode.setTask(TASK);
 		qualities = getQuality();
-
+		
+	
+		
+		for (Quality quality : qualities.getQuality()) {
+			URL urireturn = swiftService.GenerateReturnURI(quality.getName(),id);
+			quality.setReturnURL(urireturn.toString());
+		}
 		kwargs.setQualities(qualities);
 		transcode.setKwargs(kwargs);
 
@@ -105,7 +119,7 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 
 		LOGGER.debug(message);
 		Message amqpMessage = new Message(message.getBytes(), props);
-		LOGGER.debug(message);
+		
 		template.send(amqpMessage);
 
 	}
@@ -114,35 +128,36 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 	 * @return qualities
 	 */
 	private Qualities getQuality() {
-		Qualities qualities = new Qualities();
-		TranscodageProperties transcodageProperties=new TranscodageProperties();
-		Quality h264_soft = new Quality();
-		h264_soft.setBitrate(transcodageProperties.H264_SOFT_BITRATE);
-		h264_soft.setCodec(Encoder.H264SOFT.toString());
-		h264_soft.setHeight(transcodageProperties.H264_SOFT_HEIGHT);
-		h264_soft.setName(Encoder.H264SOFT.toString());
-		qualities.addQuality(h264_soft);
-
-		Quality h265_soft = new Quality();
-		h265_soft.setBitrate(transcodageProperties.H265_SOFT_BITRATE);
-		h265_soft.setCodec(Encoder.H265SOFT.toString());
-		h265_soft.setHeight(transcodageProperties.H265_SOFT_HEIGHT);
-		h265_soft.setName(Encoder.H265SOFT.toString());
-		qualities.addQuality(h265_soft);
-		
-		Quality h264_hard = new Quality();
-		h264_hard.setBitrate(transcodageProperties.H264_HARD_BITRATE);
-		h264_hard.setCodec(Encoder.H264HARD.toString());
-		h264_hard.setHeight(transcodageProperties.H264_HARD_HEIGHT);
-		h264_hard.setName(Encoder.H264HARD.toString());
-		qualities.addQuality(h264_hard);
-
-		Quality h265_hard = new Quality();
-		h265_hard.setBitrate(transcodageProperties.H265_HARD_BITRATE);
-		h265_hard.setCodec(Encoder.H265HARD.toString());
-		h265_hard.setHeight(transcodageProperties.H265_HARD_HEIGHT);
-		h265_hard.setName(Encoder.H265HARD.toString());
-		qualities.addQuality(h265_hard);
+		Qualities qualities =transcodageProperties.getTranscodageProperties();
+//		TranscodageProperties transcodageProperties=new TranscodageProperties();
+//		Quality h264_soft = new Quality();
+//		h264_soft.setBitrate(transcodageProperties.H264_SOFT_BITRATE);
+//		h264_soft.setCodec(Encoder.H264SOFT.toString());
+//		h264_soft.setHeight(transcodageProperties.H264_SOFT_HEIGHT);
+//		h264_soft.setName(Encoder.H264SOFT.toString());
+//		
+//		qualities.addQuality(h264_soft);
+//
+//		Quality h265_soft = new Quality();
+//		h265_soft.setBitrate(transcodageProperties.H265_SOFT_BITRATE);
+//		h265_soft.setCodec(Encoder.H265SOFT.toString());
+//		h265_soft.setHeight(transcodageProperties.H265_SOFT_HEIGHT);
+//		h265_soft.setName(Encoder.H265SOFT.toString());
+//		qualities.addQuality(h265_soft);
+//		
+//		Quality h264_hard = new Quality();
+//		h264_hard.setBitrate(transcodageProperties.H264_HARD_BITRATE);
+//		h264_hard.setCodec(Encoder.H264HARD.toString());
+//		h264_hard.setHeight(transcodageProperties.H264_HARD_HEIGHT);
+//		h264_hard.setName(Encoder.H264HARD.toString());
+//		qualities.addQuality(h264_hard);
+//
+//		Quality h265_hard = new Quality();
+//		h265_hard.setBitrate(transcodageProperties.H265_HARD_BITRATE);
+//		h265_hard.setCodec(Encoder.H265HARD.toString());
+//		h265_hard.setHeight(transcodageProperties.H265_HARD_HEIGHT);
+//		h265_hard.setName(Encoder.H265HARD.toString());
+//		qualities.addQuality(h265_hard);
 		
 		return qualities;
 	}

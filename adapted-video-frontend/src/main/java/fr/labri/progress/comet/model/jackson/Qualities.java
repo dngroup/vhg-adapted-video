@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Generated;
+import javax.xml.bind.annotation.XmlType;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -21,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 @JsonPropertyOrder({
     "quality"
 })
+
 public class Qualities {
 
     @JsonProperty("quality")
@@ -53,7 +55,8 @@ public class Qualities {
      * @param quality
      *     add quality
      */
-    @JsonProperty("quality")
+  
+    @JsonIgnore
     public void addQuality(Quality quality) {
         this.quality.add(quality);
     }

@@ -1,8 +1,15 @@
 
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
+import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -82,6 +89,7 @@ class DummyTEstConfig {
 	public ObjectMapper mapper(){
 		return null;
 	}
+	
 
 }
 
@@ -162,6 +170,8 @@ public class DummyTEst {
 		
 		System.out.println(message);
 	}
+	
+	
 	
 	@Inject
 	WorkerMessageServiceImpl workerMessageServiceImpl;

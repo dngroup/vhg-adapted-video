@@ -27,6 +27,7 @@ import fr.labri.progess.comet.model.ContentWrapper;
 import fr.labri.progress.comet.conf.CliConfSingleton;
 import fr.labri.progress.comet.exception.NoNewUriException;
 import fr.labri.progress.comet.exception.UnCachableContentException;
+import fr.labri.progress.comet.model.jackson.Qualities;
 import fr.labri.progress.comet.service.ContentService;
 
 /**
@@ -104,5 +105,8 @@ public class ContentEndpoint {
 		return Response.temporaryRedirect(newUri).build();
 
 	}
+	
+	
+
 	
 }

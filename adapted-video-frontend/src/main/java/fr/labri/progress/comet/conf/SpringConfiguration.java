@@ -5,6 +5,8 @@ import javax.inject.Inject;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.sql.DataSource;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 
 import org.hsqldb.jdbc.JDBCDataSource;
 import org.slf4j.Logger;
@@ -18,14 +20,12 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 
 import fr.labri.progress.comet.service.WorkerMessageService;
-import fr.labri.progress.comet.service.WorkerMessageServiceImpl;
 
 /**
  * this class is responsible for configuring spring context and repositories
@@ -84,7 +84,14 @@ public class SpringConfiguration {
 
 		return Persistence.createEntityManagerFactory("cache-orchestrator");
 	}
-
+	
+	@Bean
+	public Client client() {
+		
+		Client client = ClientBuilder.newClient();
+		return client;
+		
+	}
 //	@Bean
 //	public ObjectMapper mapper() {
 //		return new ObjectMapper();

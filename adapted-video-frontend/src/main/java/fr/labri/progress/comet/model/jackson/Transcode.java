@@ -53,8 +53,8 @@ public class Transcode {
     private Integer retries;
     @JsonProperty("eta")
     private String eta;
-    @JsonProperty("returnaddr")
-    private String returnaddr;
+    @JsonProperty("returnurl")
+    private String returnUrl;
     
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -164,9 +164,9 @@ public class Transcode {
      * @return
      *     The returnAddr
      */
-    @JsonProperty("returnaddr")
-    public String getReturnAddr() {
-        return returnaddr;
+    @JsonProperty("returnurl")
+    public String getRreturnUrl() {
+        return returnUrl;
     }
 
     /**
@@ -174,9 +174,9 @@ public class Transcode {
      * @param eta
      *     The returnAddr
      */
-    @JsonProperty("returnaddr")
-    public void setReturnAddr(String returnaddr) {
-        this.returnaddr = returnaddr;
+    @JsonProperty("returnurl")
+    public void setReturnAddr(String returnUrl) {
+        this.returnUrl = returnUrl;
     }
     
     
