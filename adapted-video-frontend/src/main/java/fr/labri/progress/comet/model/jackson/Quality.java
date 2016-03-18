@@ -32,7 +32,7 @@ public class Quality {
     private String codec;
     @JsonProperty("height")
     private Integer height;
-    @JsonProperty("returnurl")
+    @JsonProperty("returnURL")
     private String returnURL;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
