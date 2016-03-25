@@ -96,11 +96,12 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 				DateTime.now().minusHours(200)));
 		transcode.setRetries(1);
 		//TODO:uncomment Follow line
-//		swiftService.InitSecretKeys();
-		transcode.setReturnAddr(swiftService.GenerateReturnURI("Original",id).toString());
+		swiftService.loginAndCreateContainer(id);
+		
 		Kwargs kwargs = new Kwargs();
 		kwargs.setUrl(uri);
-
+		kwargs.setReturnAddr(swiftService.GenerateReturnURI("Original",id).toString());
+		kwargs.setCacheAddr(swiftService.GenerateReturnURI("Original",id,"GET").toString());
 		Qualities qualities;
 
 		transcode.setTask(TASK);

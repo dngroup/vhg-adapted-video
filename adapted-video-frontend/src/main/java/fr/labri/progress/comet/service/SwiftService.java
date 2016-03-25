@@ -4,8 +4,14 @@ import java.net.URL;
 
 public interface SwiftService {
 
-	void InitSecretKeys();
+	
 
 	URL GenerateReturnURI(String name, String id);
+
+
+	void loginAndCreateContainer(String id);
+
+
+	URL GenerateReturnURI(String name, String id, String methode);
 
 }

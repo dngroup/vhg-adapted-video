@@ -25,8 +25,12 @@ public class Kwargs {
     private Qualities qualities;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
-    /**
+    
+    @JsonProperty("returnURL")
+    private String returnURL;
+    @JsonProperty("cacheURL")
+	private String cacheURL;
+	/**
      * 
      * @return
      *     The url
@@ -75,5 +79,47 @@ public class Kwargs {
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
+
+	/**
+	 * 
+	 * @return
+	 *     The returnAddr
+	 */
+	@JsonProperty("returnURL")
+	public String getReturnUrl() {
+	    return returnURL;
+	}
+
+	/**
+	 * 
+	 * @param eta
+	 *     The returnAddr
+	 */
+	@JsonProperty("returnURL")
+	public void setReturnAddr(String returnUrl) {
+	    this.returnURL = returnUrl;
+	}
+
+	/**
+	 * 
+	 * @return
+	 *     The cacheAddr
+	 */
+	@JsonProperty("cacheURL")
+	public String getCacheUrl() {
+	    return cacheURL;
+	}
+
+	/**
+	 * 
+	 * @param eta
+	 *     The cacheAddr
+	 */
+	@JsonProperty("cacheURL")
+	public void setCacheAddr(String cacheUrl) {
+	    this.cacheURL = cacheUrl;
+	}
+
+
 
 }
