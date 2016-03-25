@@ -4,19 +4,15 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-
-import jersey.repackaged.com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import fr.labri.progess.comet.model.Content;
 import fr.labri.progess.comet.model.ContentWrapper;
 import fr.labri.progress.comet.conf.CliConfSingleton;
-import fr.labri.progress.comet.exception.NoNewUriException;
 import fr.labri.progress.comet.exception.UnCachableContentException;
-import fr.labri.progress.comet.model.jackson.Qualities;
 import fr.labri.progress.comet.service.ContentService;
+import jersey.repackaged.com.google.common.collect.Lists;
 
 /**
  * provides access to content through jax-rs rest api

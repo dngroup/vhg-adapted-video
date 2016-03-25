@@ -2,7 +2,9 @@ package fr.labri.progress.comet.service;
 
 import java.net.URL;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -27,7 +29,6 @@ import com.rabbitmq.client.Channel;
 
 import fr.labri.progress.comet.model.CachedContent;
 import fr.labri.progress.comet.model.jackson.Kwargs;
-import fr.labri.progress.comet.model.jackson.Qualities;
 import fr.labri.progress.comet.model.jackson.Quality;
 import fr.labri.progress.comet.model.jackson.Transcode;
 import fr.labri.progress.comet.repository.CachedContentRepository;
@@ -102,14 +103,14 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 		kwargs.setUrl(uri);
 		kwargs.setReturnAddr(swiftService.GenerateReturnURI("Original",id).toString());
 		kwargs.setCacheAddr(swiftService.GenerateReturnURI("Original",id,"GET").toString());
-		Qualities qualities;
+		List<Quality> qualities= new ArrayList<Quality>();
 
 		transcode.setTask(TASK);
 		qualities = getQuality();
 		
 	
 		
-		for (Quality quality : qualities.getQuality()) {
+		for (Quality quality : qualities) {
 			URL urireturn = swiftService.GenerateReturnURI(quality.getName(),id);
 			quality.setReturnURL(urireturn.toString());
 		}
@@ -128,8 +129,8 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 	/**
 	 * @return qualities
 	 */
-	private Qualities getQuality() {
-		Qualities qualities =transcodageProperties.getTranscodageProperties();
+	private List<Quality> getQuality() {
+		List<Quality> qualities =transcodageProperties.getTranscodageProperties();
 //		TranscodageProperties transcodageProperties=new TranscodageProperties();
 //		Quality h264_soft = new Quality();
 //		h264_soft.setBitrate(transcodageProperties.H264_SOFT_BITRATE);

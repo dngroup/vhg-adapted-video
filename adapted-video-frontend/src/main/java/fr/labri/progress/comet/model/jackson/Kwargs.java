@@ -2,6 +2,7 @@
 package fr.labri.progress.comet.model.jackson;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -22,8 +23,10 @@ public class Kwargs {
     @JsonProperty("url")
     private String url;
     @JsonProperty("qualities")
-    private Qualities qualities;
-    @JsonIgnore
+    private List<Quality> qualities;
+
+
+	@JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
     
     @JsonProperty("returnURL")
@@ -56,7 +59,7 @@ public class Kwargs {
      *     The qualities
      */
     @JsonProperty("qualities")
-    public Qualities getQualities() {
+    public List<Quality> getQualities() {
         return qualities;
     }
 
@@ -66,9 +69,9 @@ public class Kwargs {
      *     The qualities
      */
     @JsonProperty("qualities")
-    public void setQualities(Qualities qualities) {
-        this.qualities = qualities;
-    }
+    public void setQualities(List<Quality> qualities) {
+		this.qualities = qualities;
+	}
 
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {

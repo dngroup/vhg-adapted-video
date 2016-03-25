@@ -1,6 +1,7 @@
 package fr.labri.progress.comet.service;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -14,12 +15,13 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriBuilderException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.google.common.base.Strings;
 import com.google.common.io.BaseEncoding;
 
 import fr.labri.progress.comet.conf.CliConfSingleton;
@@ -31,20 +33,20 @@ public class SwiftServiceImp implements SwiftService {
 	@Inject
 	Client client;
 
-	String SwiftLogin = CliConfSingleton.swiftLogin;
-	String SwiftPassword = CliConfSingleton.swiftPassword;
+	final String SwiftLogin = CliConfSingleton.swiftLogin;
+	final String SwiftPassword = CliConfSingleton.swiftPassword;
 
-	String url = CliConfSingleton.swiftUrl;
-	String pathAuth = CliConfSingleton.swiftPathAuth;
-	String sharedKey = CliConfSingleton.swiftSharedKey;
+	final String url = CliConfSingleton.swiftUrl;
+	final String pathAuth = CliConfSingleton.swiftPathAuth;
+	final String sharedKey = CliConfSingleton.swiftSharedKey;
 
-	String xAuthToken;
-	URL xStorageUrl;
+	String xAuthToken = null;
+	URI xStorageUrl = null;
 
 	@Override
 	public void loginAndCreateContainer(String id) {
 		WebTarget target = client.target(url + pathAuth);
-		LOGGER.debug("Send request to server {}", target.getUri());
+		LOGGER.debug("Send request to server to login {}", target.getUri());
 		Response response = target.request().header("X-Auth-User", SwiftLogin).header("X-Auth-Key", SwiftPassword)
 				.get(Response.class);
 
@@ -69,23 +71,23 @@ public class SwiftServiceImp implements SwiftService {
 		xAuthToken = response.getHeaderString("X-Auth-Token");
 
 		try {
-			xStorageUrl = new URL(response.getHeaderString("X-Storage-Url"));
-		} catch (MalformedURLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			xStorageUrl = UriBuilder.fromUri(response.getHeaderString("X-Storage-Url")).build();
+		} catch (IllegalArgumentException e) {
+			LOGGER.error("can not converte the URI: {}", response.getHeaderString("X-Storage-Url"), e);
+		} catch (UriBuilderException e) {
+			LOGGER.error("can not converte URL builder have a problem", e);
 		}
 
 		target = client.target(xStorageUrl.toString());
-		LOGGER.debug("Send request to server  {}", target.getUri());
+		LOGGER.debug("Send request to server to put shared key {}", target.getUri());
 		response = target.request().header("X-Account-Meta-Temp-URL-Key", sharedKey).header("X-Auth-Token", xAuthToken)
 				.post(Entity.json("hello"), Response.class);
 
 		switch (Status.fromStatusCode(response.getStatus())) {
-		// TODO: verfy this return message
-		case OK:		
+		case OK:
 		case NO_CONTENT:
 		case ACCEPTED:
-			LOGGER.debug("connetion to swift ok");
+			LOGGER.debug("shared key added");
 
 			break;
 		case UNAUTHORIZED:
@@ -100,25 +102,15 @@ public class SwiftServiceImp implements SwiftService {
 			LOGGER.error("Swift connection probleme: {}", response.getStatus());
 			throw new WebApplicationException(response.getStatus());
 		}
-//		try {
-//			xStorageUrl = new URL(response.getHeaderString("X-Storage-Url"));
-//		} catch (MalformedURLException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-		
-		
-		
-		target = client.target(xStorageUrl.toString()+"/"+id);
-		LOGGER.debug("Send request to server  {}", target.getUri());
-		response = target.request().header("X-Auth-Token", xAuthToken)
-				.put(Entity.json("hello"), Response.class);
+
+		target = client.target(xStorageUrl.toString() + "/" + id);
+		LOGGER.debug("Send request to server to creat conteiner {}", target.getUri());
+		response = target.request().header("X-Auth-Token", xAuthToken).put(Entity.json("hello"), Response.class);
 
 		switch (Status.fromStatusCode(response.getStatus())) {
-		// TODO: verfy this return message
 		case ACCEPTED:
 		case CREATED:
-			LOGGER.debug("connetion to swift ok");
+			LOGGER.debug("Container created on swift");
 
 			break;
 		case UNAUTHORIZED:
@@ -133,68 +125,39 @@ public class SwiftServiceImp implements SwiftService {
 			LOGGER.error("Swift connection probleme: {}", response.getStatus());
 			throw new WebApplicationException(response.getStatus());
 		}
-//		try {
-//			xStorageUrl = new URL(response.getHeaderString("X-Storage-Url"));
-//		} catch (MalformedURLException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-
 
 	}
-	
-
 
 	@Override
 	public URL GenerateReturnURI(String name, String id) {
-		return GenerateReturnURI( name,  id,"PUT");
+		return GenerateReturnURI(name, id, "PUT");
 	}
-	
 
 	@Override
-	public URL GenerateReturnURI(String name, String id,String methode) {
-
-
-		// @debug:on
-		if (xStorageUrl == null) {
-			LOGGER.warn("Debug mode");
-			try {
-				xStorageUrl = new URL("http://swift-proxy.fr:8956/v1/auth_admin");
-			} catch (MalformedURLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
-		// @debug:off
-
-		long duration_in_seconds = 60 * 60 * 4;// 4 hours
-		long expire = duration_in_seconds + (System.currentTimeMillis() / 1000L);
-//		long expire = 1458746829L;
-		String path = xStorageUrl.getPath() + "/" + id + "/" + name;
-		String hmac_body = methode + "\n" + expire + "\n" + path;
-
-		SecretKeySpec keySpec = new SecretKeySpec(sharedKey.getBytes(), "HmacSHA1");
-
+	public URL GenerateReturnURI(String name, String id, String method) {
 		try {
+			final long duration = 60 * 60 * 4;// 4 hours (value in second)
+			long expire = duration + (System.currentTimeMillis() / 1000L);
+			URI object = UriBuilder.fromUri(xStorageUrl).path(id).path(name).build();
+
+			String hmac_body = method + "\n" + expire + "\n" + object.getPath();
+
+			SecretKeySpec keySpec = new SecretKeySpec(sharedKey.getBytes(), "HmacSHA1");
+
 			Mac mac = Mac.getInstance("HmacSHA1");
 			mac.init(keySpec);
 			byte[] rawHmac = mac.doFinal(hmac_body.getBytes());
 			String result = BaseEncoding.base16().lowerCase().encode(rawHmac);
-			String returnUrl = xStorageUrl.getProtocol() + "://" + xStorageUrl.getAuthority() + path + "?temp_url_sig="
-					+ result + "&temp_url_expires=" + expire;
-
-			return new URL(returnUrl);
+			URI returnUrl = UriBuilder.fromUri(object).queryParam("temp_url_sig", result).queryParam("temp_url_expires", expire).build();
+			return returnUrl.toURL();
 		} catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("the key :\"{}\" is not correct", e);
 			throw new WebApplicationException(e);
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("The chosen algorithm was not found ", e);
 			throw new WebApplicationException(e);
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("the URL is not correct maybe someting not coorect verfie this {}", xStorageUrl);
 			throw new WebApplicationException(e);
 		}
 
