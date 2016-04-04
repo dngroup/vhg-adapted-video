@@ -11,47 +11,51 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 
 import fr.labri.progress.comet.conf.CliConfSingleton;
 import fr.labri.progress.comet.model.jackson.Quality;
 
 @Service
-public class TranscodageProperties {
-	private static final Logger LOGGER = LoggerFactory.getLogger(TranscodageProperties.class);
+public class QualityServiceImp implements QualityService {
+	private static final Logger LOGGER = LoggerFactory.getLogger(QualityServiceImp.class);
 	public Integer H264_SOFT_HEIGHT = 720;
 	public Integer H265_SOFT_HEIGHT = 720;
 	public Integer H264_SOFT_BITRATE = 1500;
 	public Integer H265_SOFT_BITRATE = 1000;
 
-	/**
-	 * Get list of quality from file 
-	 * @return a list of qualities
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * fr.labri.progress.comet.service.QualityService#getTranscodageProperties()
 	 */
+	@Override
 	public List<Quality> getTranscodageProperties() {
 		ObjectMapper mapper = new ObjectMapper();
 		InputStream input = null;
-	if (!Strings.isNullOrEmpty(CliConfSingleton.TranscodageFile)) {
+		if (!Strings.isNullOrEmpty(CliConfSingleton.TranscodageFile)) {
 			try {
 
 				input = new FileInputStream(CliConfSingleton.TranscodageFile);
 				File file = new File(CliConfSingleton.TranscodageFile);
-				List<Quality> qualities = mapper.readValue(file, new TypeReference<List<Quality>>(){});
+				List<Quality> qualities = mapper.readValue(file, new TypeReference<List<Quality>>() {
+				});
 
 				// load a properties file
 				return qualities;
 			} catch (IOException ex) {
-				LOGGER.info("TRANSCOD_PARAM_FILE={} error with this file set default value", CliConfSingleton.TranscodageFile);
+				LOGGER.info("TRANSCOD_PARAM_FILE={} error with this file set default value",
+						CliConfSingleton.TranscodageFile);
 			} finally {
 				if (input != null) {
 					try {
 						input.close();
 					} catch (IOException e) {
-						LOGGER.warn("input can not be close");;
+						LOGGER.warn("input can not be close");
+						;
 					}
 				}
 			}
@@ -62,7 +66,8 @@ public class TranscodageProperties {
 
 		}
 
-		List<Quality> qualities =new ArrayList<Quality>();
+		// LOAD DEFAULT VALUE
+		List<Quality> qualities = new ArrayList<Quality>();
 
 		Quality quality = new Quality();
 		quality.setBitrate(H264_SOFT_BITRATE);
@@ -77,17 +82,6 @@ public class TranscodageProperties {
 		quality2.setName("360H265_default");
 		quality2.setHeight(H265_SOFT_HEIGHT);
 		qualities.add(quality2);
-
-		ObjectMapper mapper2 = new ObjectMapper();
-
-		// Object to JSON in String
-		try {
-			LOGGER.debug(mapper2.writeValueAsString(qualities));
-
-		} catch (JsonProcessingException e) {
-			LOGGER.error("Can not convert you Transcode object to json", e);
-			throw Throwables.propagate(e);
-		}
 
 		return qualities;
 	}

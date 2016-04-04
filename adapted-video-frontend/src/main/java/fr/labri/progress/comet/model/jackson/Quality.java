@@ -3,6 +3,7 @@ package fr.labri.progress.comet.model.jackson;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.annotation.Generated;
 import javax.xml.bind.annotation.XmlType;
 

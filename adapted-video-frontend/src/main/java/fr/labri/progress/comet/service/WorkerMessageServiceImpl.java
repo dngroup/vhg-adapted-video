@@ -20,7 +20,6 @@ import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.support.converter.SimpleMessageConverter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ErrorHandler;
 
@@ -52,20 +51,18 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 	@Inject
 	volatile CachedContentRepository repo;
 
-	@Autowired
+	@Inject
 	SwiftService swiftService;
 	
 	@Inject
 	ObjectMapper mapper;
 	
 	@Inject
-	TranscodageProperties transcodageProperties;
+	QualityService qualityService;
 
 	private static final String TASK = "adaptation.commons.staging_and_admission_workflow";
 
 	private static final MessageProperties props = new MessageProperties();
-
-	private static final String key = "azerty";
 
 	public enum Encoder { 
 		H264("H264"), H265("H265"),H264SOFT("SOFT_H264"), H265SOFT("SOFT_H265"),H264HARD("HARD_H264"), H265HARD("HARD_H265");
@@ -130,7 +127,7 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 	 * @return qualities
 	 */
 	private List<Quality> getQuality() {
-		List<Quality> qualities =transcodageProperties.getTranscodageProperties();
+		List<Quality> qualities =qualityService.getTranscodageProperties();
 //		TranscodageProperties transcodageProperties=new TranscodageProperties();
 //		Quality h264_soft = new Quality();
 //		h264_soft.setBitrate(transcodageProperties.H264_SOFT_BITRATE);

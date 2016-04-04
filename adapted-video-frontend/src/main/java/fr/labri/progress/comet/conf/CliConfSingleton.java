@@ -17,12 +17,12 @@ public final class CliConfSingleton {
 	public static String externalAddr;
 	public static Integer frontendPort;
 	public static String storageHostname = System.getenv().get("STORAGE_HOSTNAME");
-	public static String frontendHostname= System.getenv().get("FRONTEND_HOSTNAME");
+	public static String frontendHostname = System.getenv().get("FRONTEND_HOSTNAME");
 	
-	public static String swiftUrl = "http://10.10.1.107:8080";
-	public static String swiftPathAuth = "/auth/v1.0";
-	public static String swiftSharedKey = "azerty";
-	public static String swiftLogin= "admin:admin";
-	public static String swiftPassword="admin";
+	public static String swiftUrl;
+	public static String swiftPathAuth;
+	public static String swiftSharedKey;
+	public static String swiftLogin ;
+	public static String swiftPassword ;
 
 }

@@ -3,7 +3,6 @@ package fr.labri.progress.comet.service;
 import java.util.Collection;
 
 import fr.labri.progess.comet.model.Content;
-import fr.labri.progress.comet.exception.NoNewUriException;
 import fr.labri.progress.comet.exception.UnCachableContentException;
 
 public interface ContentService {

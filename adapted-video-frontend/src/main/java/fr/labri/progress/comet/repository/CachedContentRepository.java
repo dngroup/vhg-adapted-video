@@ -1,6 +1,5 @@
 package fr.labri.progress.comet.repository;
 
-import java.net.URI;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,8 +1,8 @@
 package fr.labri.progress.comet.conf;
 
+import org.glassfish.jersey.jettison.JettisonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.spring.scope.RequestContextFilter;
-import org.glassfish.jersey.jettison.JettisonFeature;
 
 import fr.labri.progress.comet.endpoint.ConfigurationEndpoint;
 import fr.labri.progress.comet.endpoint.ContentEndpoint;
