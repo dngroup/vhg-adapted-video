@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Date;
 import java.util.Collection;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -21,13 +22,18 @@ import fr.labri.progess.comet.model.Content;
 import fr.labri.progress.comet.conf.CliConfSingleton;
 import fr.labri.progress.comet.exception.UnCachableContentException;
 import fr.labri.progress.comet.model.CachedContent;
+import fr.labri.progress.comet.model.Quality;
 import fr.labri.progress.comet.repository.CachedContentRepository;
+import fr.labri.progress.comet.repository.QualityRepository;
 
 @Service
 public class ContentServiceImpl implements ContentService {
 
 	@Inject
 	CachedContentRepository repo;
+	
+	@Inject
+	QualityRepository qualiltyRepository;
 
 	@Inject
 	WorkerMessageService workerMessageService;
@@ -81,8 +87,8 @@ public class ContentServiceImpl implements ContentService {
 
 	@Override
 	public Collection<Content> getCache() {
-
-		return Lists.transform(repo.findAll(),
+		List<CachedContent> cachedContents = repo.findAll();
+		return Lists.transform(cachedContents,
 				new Function<CachedContent, Content>() {
 
 					@Override

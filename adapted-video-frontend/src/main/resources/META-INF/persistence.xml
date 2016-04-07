@@ -5,6 +5,8 @@
 	<persistence-unit name="cache-orchestrator"
 		transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+		<class>fr.labri.progress.comet.model.CachedContent</class>
+		<class>fr.labri.progress.comet.model.Quality</class>
 
 
 		<properties>

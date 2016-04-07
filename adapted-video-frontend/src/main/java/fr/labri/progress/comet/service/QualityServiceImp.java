@@ -21,9 +21,9 @@ import fr.labri.progress.comet.model.jackson.Quality;
 @Service
 public class QualityServiceImp implements QualityService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(QualityServiceImp.class);
-	public Integer H264_SOFT_HEIGHT = 720;
+	public Integer H264_SOFT_HEIGHT = 240;
 	public Integer H265_SOFT_HEIGHT = 720;
-	public Integer H264_SOFT_BITRATE = 1500;
+	public Integer H264_SOFT_BITRATE = 500;
 	public Integer H265_SOFT_BITRATE = 1000;
 
 	/*

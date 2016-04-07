@@ -49,6 +49,7 @@ public class ContentEndpoint {
 	@Produces(MediaType.APPLICATION_XML)
 	public ContentWrapper list() {
 		ContentWrapper wrapper = new ContentWrapper();
+		
 		wrapper.setContents(Lists.newArrayList(contentService.getCache()));
 		return wrapper;
 	}
