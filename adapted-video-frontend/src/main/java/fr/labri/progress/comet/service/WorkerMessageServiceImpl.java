@@ -2,7 +2,6 @@ package fr.labri.progress.comet.service;
 
 import java.net.URL;
 import java.sql.Date;
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +25,6 @@ import org.springframework.util.ErrorHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
-import com.sun.tools.xjc.reader.xmlschema.bindinfo.BIConversion.Static;
 
 import fr.labri.progress.comet.model.CachedContent;
 import fr.labri.progress.comet.model.jackson.Kwargs;

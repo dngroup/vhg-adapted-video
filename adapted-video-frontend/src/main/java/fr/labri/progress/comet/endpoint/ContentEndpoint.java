@@ -84,7 +84,7 @@ public class ContentEndpoint {
 			@PathParam("quality") String quality) throws URISyntaxException {
 
 		URI newUri = UriBuilder.fromPath(CliConfSingleton.streamerBaseURL)
-				.path(contentId).path("encoding").path(quality + ".mp4")
+				.path(contentId).path(quality)
 				.build();
 		return Response.seeOther(newUri).build();
 

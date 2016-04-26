@@ -105,7 +105,7 @@ public class SwiftServiceImp implements SwiftService {
 
 		target = client.target(xStorageUrl.toString() + "/" + id);
 		LOGGER.debug("Send request to server to creat conteiner {}", target.getUri());
-		response = target.request().header("X-Auth-Token", xAuthToken).put(Entity.json("hello"), Response.class);
+		response = target.request().header("X-Auth-Token", xAuthToken).header("X-Container-Read"," .r:*").header("X-Container-Meta-Access-Control-Allow-Origin", "*").header("X-Container-Meta-Access-Control-Allow-Method", "GET").put(Entity.json("hello"), Response.class);
 
 		switch (Status.fromStatusCode(response.getStatus())) {
 		case ACCEPTED:
