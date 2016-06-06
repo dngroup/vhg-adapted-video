@@ -24,5 +24,6 @@ public final class CliConfSingleton {
 	public static String swiftSharedKey;
 	public static String swiftLogin ;
 	public static String swiftPassword ;
+	public static boolean dummyStorage;
 
 }

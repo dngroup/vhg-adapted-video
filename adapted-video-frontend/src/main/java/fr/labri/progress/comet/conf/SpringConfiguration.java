@@ -25,6 +25,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 
+import fr.labri.progress.comet.service.DummyStorage;
+import fr.labri.progress.comet.service.StorageService;
+import fr.labri.progress.comet.service.SwiftServiceImp;
 import fr.labri.progress.comet.service.WorkerMessageService;
 
 /**
@@ -34,20 +37,18 @@ import fr.labri.progress.comet.service.WorkerMessageService;
  *
  */
 @Configuration
-@ComponentScan(basePackages = { "fr.labri.progress.comet.service",
-		"fr.labri.progress.comet.repository", "fr.labri.progress.comet.conf" })
+@ComponentScan(basePackages = { "fr.labri.progress.comet.service", "fr.labri.progress.comet.repository",
+		"fr.labri.progress.comet.conf" })
 @EnableJpaRepositories("fr.labri.progress.comet.repository")
 @Import(RabbitMqConfiguration.class)
 public class SpringConfiguration {
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(SpringConfiguration.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SpringConfiguration.class);
 
 	@Bean
 	public ObjectMapper getObjectMapper() {
 		ObjectMapper om = new ObjectMapper();
-		AnnotationIntrospector introspector = new JaxbAnnotationIntrospector(
-				TypeFactory.defaultInstance());
+		AnnotationIntrospector introspector = new JaxbAnnotationIntrospector(TypeFactory.defaultInstance());
 		om.setAnnotationIntrospector(introspector);
 		return om;
 
@@ -84,17 +85,29 @@ public class SpringConfiguration {
 
 		return Persistence.createEntityManagerFactory("cache-orchestrator");
 	}
-	
+
 	@Bean
 	public Client client() {
-		
+
 		Client client = ClientBuilder.newClient();
 		return client;
-		
+
 	}
-//	@Bean
-//	public ObjectMapper mapper() {
-//		return new ObjectMapper();
-//	}
+
+	@Bean
+	@Inject
+	public StorageService storageService(Client client) {
+		if (CliConfSingleton.dummyStorage) {
+			return new DummyStorage();
+		} else
+			return new SwiftServiceImp(client, CliConfSingleton.swiftLogin, CliConfSingleton.swiftPassword,
+					CliConfSingleton.swiftUrl, CliConfSingleton.swiftPathAuth, CliConfSingleton.swiftSharedKey);
+
+	}
+
+	// @Bean
+	// public ObjectMapper mapper() {
+	// return new ObjectMapper();
+	// }
 
 }

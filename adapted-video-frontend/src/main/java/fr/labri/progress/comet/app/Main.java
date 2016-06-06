@@ -54,7 +54,7 @@ public class Main {
 			CliConfSingleton.swiftSharedKey = cliconf.getSwiftSharedKey();
 			CliConfSingleton.swiftLogin = cliconf.getSwiftLogin();
 			CliConfSingleton.swiftPassword= cliconf.getSwiftPassword();
-			
+			CliConfSingleton.dummyStorage = cliconf.getDummyStorage();
 			
 			
 //			if (cliconf.getExternalAddr()!=null){
@@ -167,6 +167,10 @@ interface CliConfiguration {
 
 	@Option(longName = "swift-password", defaultValue = "admin", description = "the password of user for swift")
 	String getSwiftPassword();
+	
+	@Option(longName = "dummyStorage", description = "Dummy starge true/flase")
+	boolean getDummyStorage();
+
 
 	
 	

@@ -51,7 +51,7 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 	volatile CachedContentRepository repo;
 
 	@Inject
-	SwiftService swiftService;
+	StorageService stroageService;
 
 	@Inject
 	ObjectMapper mapper;
@@ -92,20 +92,20 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 		transcode.setId(id);
 		transcode.setEta(ISODateTimeFormat.dateTimeNoMillis().print(DateTime.now().minusHours(200)));
 		transcode.setRetries(1);
-		// TODO:uncomment Follow line
-		swiftService.loginAndCreateContainer(id);
+		// TODO:uncomment Follow linegeneratePushURL
+		stroageService.createStorageFolder(id);
 
 		Kwargs kwargs = new Kwargs();
 		kwargs.setUrl(uri);
-		kwargs.setReturnAddr(swiftService.GenerateReturnURI("Original", id).toString());
-		kwargs.setCacheAddr(swiftService.GenerateReturnURI("Original", id, "GET").toString());
+		kwargs.setReturnAddr(stroageService.generateWriteURL("Original", id).toString());
+		kwargs.setCacheAddr(stroageService.generateReadURL("Original", id).toString());
 		List<Quality> qualities = new ArrayList<Quality>();
 
 		transcode.setTask(TASK);
 		qualities = getQuality();
 
 		for (Quality quality : qualities) {
-			URL urireturn = swiftService.GenerateReturnURI(quality.getName(), id);
+			URL urireturn = stroageService.generateWriteURL(quality.getName(), id);
 			quality.setReturnURL(urireturn.toString());
 		}
 		kwargs.setQualities(qualities);

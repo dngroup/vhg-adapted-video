@@ -147,7 +147,7 @@ public class LabriDefaultHttpProxyServer implements HttpProxyServer {
 							.path("api").path("content").path(c.getId())
 							.path(c.getQualities().get(0)).build().toString();
 					response.headers().add("Location", redirectUri);
-					LOGGER.debug("Redirecting it to ", redirectUri);
+					LOGGER.debug("Redirecting it to {}", redirectUri);
 					return response;
 				}
 

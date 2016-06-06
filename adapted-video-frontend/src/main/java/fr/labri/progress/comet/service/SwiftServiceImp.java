@@ -26,25 +26,33 @@ import com.google.common.io.BaseEncoding;
 
 import fr.labri.progress.comet.conf.CliConfSingleton;
 
-@Service
-public class SwiftServiceImp implements SwiftService {
+
+public class SwiftServiceImp implements StorageService {
 	private static Logger LOGGER = LoggerFactory.getLogger(SwiftServiceImp.class);
 
-	@Inject
-	Client client;
+	final Client client;
 
-	final String SwiftLogin = CliConfSingleton.swiftLogin;
-	final String SwiftPassword = CliConfSingleton.swiftPassword;
-
-	final String url = CliConfSingleton.swiftUrl;
-	final String pathAuth = CliConfSingleton.swiftPathAuth;
-	final String sharedKey = CliConfSingleton.swiftSharedKey;
+	final String SwiftLogin;
+	final String SwiftPassword;
+	final String url;
+	final String pathAuth;
+	final String sharedKey;
 
 	String xAuthToken = null;
 	URI xStorageUrl = null;
 
+	public SwiftServiceImp(final Client client, final String SwiftLogin, final String SwiftPassword, final String url,
+			final String pathAuth, final String sharedKey) {
+		this.client = client;
+		this.SwiftLogin = SwiftLogin;
+		this.SwiftPassword = SwiftPassword;
+		this.url = url;
+		this.pathAuth = pathAuth;
+		this.sharedKey = sharedKey;
+	}
+
 	@Override
-	public void loginAndCreateContainer(String id) {
+	public void createStorageFolder(String id) {
 		WebTarget target = client.target(url + pathAuth);
 		LOGGER.debug("Send request to server to login {}", target.getUri());
 		Response response = target.request().header("X-Auth-User", SwiftLogin).header("X-Auth-Key", SwiftPassword)
@@ -105,7 +113,10 @@ public class SwiftServiceImp implements SwiftService {
 
 		target = client.target(xStorageUrl.toString() + "/" + id);
 		LOGGER.debug("Send request to server to creat conteiner {}", target.getUri());
-		response = target.request().header("X-Auth-Token", xAuthToken).header("X-Container-Read"," .r:*").header("X-Container-Meta-Access-Control-Allow-Origin", "*").header("X-Container-Meta-Access-Control-Allow-Method", "GET").put(Entity.json("hello"), Response.class);
+		response = target.request().header("X-Auth-Token", xAuthToken).header("X-Container-Read", " .r:*")
+				.header("X-Container-Meta-Access-Control-Allow-Origin", "*")
+				.header("X-Container-Meta-Access-Control-Allow-Method", "GET")
+				.put(Entity.json("hello"), Response.class);
 
 		switch (Status.fromStatusCode(response.getStatus())) {
 		case ACCEPTED:
@@ -129,12 +140,16 @@ public class SwiftServiceImp implements SwiftService {
 	}
 
 	@Override
-	public URL GenerateReturnURI(String name, String id) {
-		return GenerateReturnURI(name, id, "PUT");
+	public URL generateWriteURL(String name, String id) {
+		return generatePushURL(name, id, "PUT");
 	}
 
 	@Override
-	public URL GenerateReturnURI(String name, String id, String method) {
+	public URL generateReadURL(String name, String id) {
+		return generatePushURL(name, id, "GET");
+	}
+
+	public URL generatePushURL(String name, String id, String method) {
 		try {
 			final long duration = 60 * 60 * 4;// 4 hours (value in second)
 			long expire = duration + (System.currentTimeMillis() / 1000L);
@@ -148,7 +163,8 @@ public class SwiftServiceImp implements SwiftService {
 			mac.init(keySpec);
 			byte[] rawHmac = mac.doFinal(hmac_body.getBytes());
 			String result = BaseEncoding.base16().lowerCase().encode(rawHmac);
-			URI returnUrl = UriBuilder.fromUri(object).queryParam("temp_url_sig", result).queryParam("temp_url_expires", expire).build();
+			URI returnUrl = UriBuilder.fromUri(object).queryParam("temp_url_sig", result)
+					.queryParam("temp_url_expires", expire).build();
 			return returnUrl.toURL();
 		} catch (InvalidKeyException e) {
 			LOGGER.error("the key :\"{}\" is not correct", e);
