@@ -1,7 +1,7 @@
 package fr.labri.progress.comet.model;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +38,7 @@ public class CachedContent implements Serializable {
 	private Date requestDate;
 	private Date createdAt;
 	private Date validTo;
+	private int duration;
 
 	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
 	@JoinTable( name="QualitesContent", joinColumns=@JoinColumn(name="cachedContent"), inverseJoinColumns = @JoinColumn( name="Quality"))
@@ -149,6 +150,18 @@ public class CachedContent implements Serializable {
 	 */
 	public void setQualities2(List<Quality> qualities) {
 		this.qualities = qualities;
+	}
+
+	public int getDuration() {
+		return duration;
+	}
+
+	/**
+	 * 
+	 * @param duration in second
+	 */
+	public void setDuration(int duration) {
+		this.duration = duration;
 	}
 
 	static Function<String, Quality> stringToQuality = new Function<String, Quality>() {

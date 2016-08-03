@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 
 import fr.labri.progress.comet.model.CachedContent;
+import fr.labri.progress.comet.model.WorkerMessage;
 import fr.labri.progress.comet.model.jackson.Kwargs;
 import fr.labri.progress.comet.model.jackson.Quality;
 import fr.labri.progress.comet.model.jackson.Transcode;

@@ -6,6 +6,7 @@ import org.glassfish.jersey.server.spring.scope.RequestContextFilter;
 
 import fr.labri.progress.comet.endpoint.ConfigurationEndpoint;
 import fr.labri.progress.comet.endpoint.ContentEndpoint;
+import fr.labri.progress.comet.endpoint.MonitoringEndpoint;
 import fr.labri.progress.comet.endpoint.StatisticsTest;
 
 /**
@@ -22,6 +23,7 @@ public class RestConfiguration extends ResourceConfig {
 		register(RequestContextFilter.class);
 		register(ContentEndpoint.class);
 		register(ConfigurationEndpoint.class);
+		register(MonitoringEndpoint.class);
 		register(StatisticsTest.class);
 //		register(ThridPartyStorageEndPoint.class);
 		register(JettisonFeature.class);

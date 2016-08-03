@@ -30,11 +30,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 
+import fr.labri.progress.comet.model.WorkerMessage;
 import fr.labri.progress.comet.model.jackson.Kwargs;
 import fr.labri.progress.comet.model.jackson.Quality;
 import fr.labri.progress.comet.model.jackson.Transcode;
 import fr.labri.progress.comet.repository.CachedContentRepository;
-import fr.labri.progress.comet.service.WorkerMessage;
 import fr.labri.progress.comet.service.WorkerMessageServiceImpl;
 
 @Configuration

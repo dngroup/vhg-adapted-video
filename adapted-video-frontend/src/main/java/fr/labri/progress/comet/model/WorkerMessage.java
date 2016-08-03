@@ -1,15 +1,15 @@
-package fr.labri.progress.comet.service;
+package fr.labri.progress.comet.model;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class WorkerMessage {
-	String quality;
-	String main_task_id;
-	Boolean complete;
-	String md5;
-	String timestart;
-	String timeend;
+	public String quality;
+	public String main_task_id;
+	public Boolean complete;
+	public String md5;
+	public String timestart;
+	public String timeend;
 
 	public String getQuality() {
 		return quality;
