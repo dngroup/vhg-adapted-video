@@ -1,6 +1,8 @@
 
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.xml.bind.JAXBContext;
@@ -28,13 +30,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 
-import fr.labri.progress.comet.conf.CliConfSingleton;
+import fr.labri.progress.comet.model.WorkerMessage;
 import fr.labri.progress.comet.model.jackson.Kwargs;
-import fr.labri.progress.comet.model.jackson.Qualities;
 import fr.labri.progress.comet.model.jackson.Quality;
 import fr.labri.progress.comet.model.jackson.Transcode;
 import fr.labri.progress.comet.repository.CachedContentRepository;
-import fr.labri.progress.comet.service.WorkerMessage;
 import fr.labri.progress.comet.service.WorkerMessageServiceImpl;
 
 @Configuration
@@ -82,6 +82,7 @@ class DummyTEstConfig {
 	public ObjectMapper mapper(){
 		return null;
 	}
+	
 
 }
 
@@ -118,19 +119,19 @@ public class DummyTEst {
 		transcode.setTask("adaptation.commons.encode_workflow");
 		Kwargs kwargs = new Kwargs();
 		kwargs.setUrl("http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4?13");
-		Qualities qualities = new Qualities();
+		List<Quality> qualities = new ArrayList<Quality>();
 		Quality quality = new Quality();
 		quality.setBitrate(500);
 		quality.setCodec("libx264");
 		quality.setHeight(320);
 		quality.setName("lowx264");
-		qualities.addQuality(quality );
+		qualities.add(quality );
 		Quality qualityx265 = new Quality();
 		qualityx265.setBitrate(250);
 		qualityx265.setCodec("libx265");
 		qualityx265.setHeight(320);
 		qualityx265.setName("lowx265");
-		qualities.addQuality(qualityx265 );
+		qualities.add(qualityx265 );
 		kwargs.setQualities(qualities );
 		transcode.setKwargs(kwargs );
 	
@@ -162,6 +163,8 @@ public class DummyTEst {
 		
 		System.out.println(message);
 	}
+	
+	
 	
 	@Inject
 	WorkerMessageServiceImpl workerMessageServiceImpl;

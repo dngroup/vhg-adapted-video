@@ -1,14 +1,23 @@
 package fr.labri.progress.comet.model;
 
 import java.io.Serializable;
-import java.sql.Date;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.ElementCollection;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 
 import fr.labri.progess.comet.model.Content;
 
@@ -17,17 +26,26 @@ import fr.labri.progess.comet.model.Content;
  *
  */
 @Entity
+@NamedQuery(name = "CachedContent.findAll", query = "SELECT p FROM CachedContent p")
+@NamedEntityGraph(name = "CachedContent.detail", attributeNodes = @NamedAttributeNode("qualities"))
 public class CachedContent implements Serializable {
-
+	private static final long serialVersionUID = 1L;
 	private String oldUri;
 
 	@Id
 	private String id;
+	// TODO: this flow line is for get time to encode
+	private Date requestDate;
 	private Date createdAt;
 	private Date validTo;
-	@ElementCollection(targetClass = String.class, fetch=FetchType.EAGER)
-	private List<String> qualities = new ArrayList<String>();
-	private static final long serialVersionUID = 1L;
+	private int duration;
+
+	@OneToMany(cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
+	@JoinTable( name="QualitesContent", joinColumns=@JoinColumn(name="cachedContent"), inverseJoinColumns = @JoinColumn( name="Quality"))
+	private List<Quality> qualities = new ArrayList<Quality>();
+
+	// @ElementCollection(targetClass = String.class, fetch=FetchType.EAGER)
+	// private List<String> qualities = new ArrayList<String>();
 
 	public CachedContent() {
 		super();
@@ -72,7 +90,8 @@ public class CachedContent implements Serializable {
 
 		c.setId(content.getId());
 		c.getQualities().clear();
-		c.getQualities().addAll(content.getQualities());
+
+		c.getQualities().addAll(Lists.transform(content.getQualities(), stringToQuality));
 
 		c.setOldUri(content.getUri());
 
@@ -83,22 +102,87 @@ public class CachedContent implements Serializable {
 		Content c = new Content();
 		if (content.createdAt != null)
 			c.setCreated(new Date(content.createdAt.getTime()));
+		else if (content.requestDate != null)
+			c.setCreated(new Date(content.requestDate.getTime()));
+
 		c.setId(content.getId());
 		if (content.getOldUri() != null)
 			c.setUri(content.getOldUri());
 
 		c.getQualities().clear();
-		c.getQualities().addAll(content.getQualities());
+		c.getQualities().addAll(Lists.transform(content.getQualities(), qualityToString));
 		return c;
 	}
 
-	
-	public List<String> getQualities() {
+	// public List<String> getQualities() {
+	// return qualities;
+	// }
+	//
+	// public void setQualities(List<String> qualities) {
+	// this.qualities = qualities;
+	// }
+
+	/**
+	 * @return the requestDate
+	 */
+	public Date getRequestDate() {
+		return requestDate;
+	}
+
+	/**
+	 * @param requestDate
+	 *            the requestDate to set
+	 */
+	public void setRequestDate(Date requestDate) {
+		this.requestDate = requestDate;
+	}
+
+	/**
+	 * @return the qualities2
+	 */
+	public List<Quality> getQualities() {
 		return qualities;
 	}
 
-	public void setQualities(List<String> qualities) {
+	/**
+	 * @param qualities2
+	 *            the qualities2 to set
+	 */
+	public void setQualities2(List<Quality> qualities) {
 		this.qualities = qualities;
 	}
+
+	public int getDuration() {
+		return duration;
+	}
+
+	/**
+	 * 
+	 * @param duration in second
+	 */
+	public void setDuration(int duration) {
+		this.duration = duration;
+	}
+
+	static Function<String, Quality> stringToQuality = new Function<String, Quality>() {
+
+		@Override
+		public Quality apply(String name) {
+			Quality quality = new Quality();
+			quality.setName(name);
+			return quality;
+		}
+
+	};
+
+	static Function<Quality, String> qualityToString = new Function<Quality, String>() {
+
+		@Override
+		public String apply(Quality quality) {
+
+			return quality.getName();
+		}
+
+	};
 
 }

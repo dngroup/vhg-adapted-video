@@ -14,7 +14,6 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 
 import com.lexicalscope.jewel.cli.CliFactory;
 import com.lexicalscope.jewel.cli.HelpRequestedException;
-import com.lexicalscope.jewel.cli.InvalidOptionSpecificationException;
 import com.lexicalscope.jewel.cli.Option;
 
 import fr.labri.progress.comet.conf.CliConfSingleton;
@@ -48,7 +47,22 @@ public class Main {
 			CliConfSingleton.rabbitPassword = cliconf.getRabbitPassword();
 			CliConfSingleton.rabbitPort = cliconf.getRabbitPort();
 			CliConfSingleton.streamerBaseURL= cliconf.getStreamerUrl();
-
+			CliConfSingleton.frontendPort= cliconf.getPort();
+			
+			CliConfSingleton.swiftUrl = cliconf.getSwiftUrl ();
+			CliConfSingleton.swiftPathAuth = cliconf.getSwiftPathAuth();
+			CliConfSingleton.swiftSharedKey = cliconf.getSwiftSharedKey();
+			CliConfSingleton.swiftLogin = cliconf.getSwiftLogin();
+			CliConfSingleton.swiftPassword= cliconf.getSwiftPassword();
+			CliConfSingleton.dummyStorage = cliconf.getDummyStorage();
+			
+			
+//			if (cliconf.getExternalAddr()!=null){
+//			CliConfSingleton.externalAddr= cliconf.getExternalAddr();
+//			}
+//			else {
+//				CliConfSingleton.externalAddr=  "http://"+cliconf.getHost()+":"+cliconf.getPort();
+//			}
 			String baseHost = cliconf.getHost();
 			int pasePort = cliconf.getPort();
 
@@ -120,7 +134,8 @@ interface CliConfiguration {
 	@Option(shortName = "p", longName = "port", defaultValue = "8080", description = "the port on which the frontend will listen for http connections")
 	Integer getPort();
 
-	@Option(shortName = "h", longName = "host", defaultValue = "localhost", description = "the hostname or IP on which the frontend will listen for http connections")
+	
+	@Option(shortName = "h", longName = "host", defaultValue = "0.0.0.0", description = "the hostname or IP on which the frontend will listen for http connections")
 	String getHost();
 
 	@Option(longName = "rabbit-host", defaultValue = "localhost")
@@ -137,6 +152,30 @@ interface CliConfiguration {
 
 	@Option(longName = "streamer-url", defaultValue = "http://192.168.236.60:8080/v1/AUTH_admin/", description = "the base url of the streamer to use")
 	String getStreamerUrl();
+	
+	@Option(longName = "swift-url", defaultValue = "http://CDN-LB:8080", description = "the base url of the swift to use")
+	String getSwiftUrl();
+	
+	@Option(longName = "swift-pathAuth", defaultValue = "/auth/v1.0", description = "the path for login swift default: /auth/v1.0")
+	String getSwiftPathAuth();
+	
+	@Option(longName = "swift-sharedKey", defaultValue = "azerty", description = "the key to use for swift")
+	String getSwiftSharedKey();
+
+	@Option(longName = "swift-login", defaultValue = "admin:admin", description = "the username of user for swift")
+	String getSwiftLogin();
+
+	@Option(longName = "swift-password", defaultValue = "admin", description = "the password of user for swift")
+	String getSwiftPassword();
+	
+	@Option(longName = "dummyStorage", description = "Dummy starge true/flase")
+	boolean getDummyStorage();
+
+
+	
+	
+//	@Option(longName = "external-addr",defaultToNull=true,description="The Frontend address for the workers")
+//	String getExternalAddr();
 
 	@Option(helpRequest = true)
 	boolean getHelp();

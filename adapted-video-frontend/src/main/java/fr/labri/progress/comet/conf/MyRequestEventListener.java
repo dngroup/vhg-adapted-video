@@ -31,6 +31,8 @@ public class MyRequestEventListener implements RequestEventListener {
 			LOGGER.trace("Request {} finished. Processing time {} ms ",
 					+requestNumber, (System.currentTimeMillis() - startTime));
 			break;
+		default:
+			break;
 
 		}
 	}

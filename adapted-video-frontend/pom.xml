@@ -2,8 +2,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>fr.labri.progress.comet</groupId>
-
 	<artifactId>adapted-video-frontend</artifactId>
 	<packaging>jar</packaging>
 	<name>adapted-video-frontend</name>
@@ -53,6 +51,12 @@
 				<artifactId>spring-rabbit</artifactId>
 				<version>1.4.0.RELEASE</version>
 			</dependency>
+<!-- 			<dependency> -->
+<!-- 				<groupId>org.apache.jclouds.api</groupId> -->
+<!-- 				<artifactId>swift</artifactId> -->
+<!-- 				<version>1.9.2</version> -->
+<!-- 			</dependency> -->
+			
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
@@ -157,6 +161,14 @@
 			<artifactId>log4j-over-slf4j</artifactId>
 
 		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.media</groupId>
+			<artifactId>jersey-media-json-jettison</artifactId>
+		</dependency>
+
+
+		
 		
 	<!-- need this for test with spring -->
 		<dependency>
@@ -198,7 +210,7 @@
 								</ports>
 
 								<cmd>
-									<shell>java -cp /maven/*:/maven/${project.build.finalName} fr.labri.progress.comet.app.Main --host 0.0.0.0 --port 8080 --rabbit-host $AMQP_PORT_5672_TCP_ADDR --rabbit-port $AMQP_PORT_5672_TCP_PORT --streamer-url $STREAMER_URL</shell>
+									<shell>java -cp /maven/*:/maven/${project.build.finalName} fr.labri.progress.comet.app.Main --host 0.0.0.0 --port 8080 --rabbit-host $AMQP_PORT_5672_TCP_ADDR --rabbit-port $AMQP_PORT_5672_TCP_PORT --streamer-url $STREAMER_URL --swift-url $SWIFT_URL $DEBUG</shell>
 								</cmd>
 
 							</build>
@@ -244,6 +256,7 @@
 					</descriptorRefs>
 				</configuration>
 			</plugin>
+			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -269,7 +282,80 @@
 					<mainClass>fr.labri.progress.comet.app.Main</mainClass>
 				</configuration>
 			</plugin>
+			
+			<plugin>
+       				<groupId>org.apache.maven.plugins</groupId>
+			        <artifactId>maven-dependency-plugin</artifactId>
+			        <version>2.10</version>
+			        <executions>
+			          <execution>
+			            <id>copy</id>
+			            <phase>package</phase>
+			            <goals>
+			              <goal>copy</goal>
+			            </goals>
+			            <configuration>
+			              <artifactItems>
+			                <artifactItem>
+			                  <groupId>${project.groupId} </groupId>
+			                  <artifactId>${project.artifactId}</artifactId>
+			                  <version>${project.version}</version>
+								 <classifier>jar-with-dependencies</classifier>
+			                  <type>jar</type>
+			                  <overWrite>false</overWrite>
+			                  <outputDirectory>${project.build.directory}/../docker/</outputDirectory>
+			                  <destFileName>${project.artifactId}.jar</destFileName>
+			                  
+			                </artifactItem>
+			              </artifactItems>
+			              <outputDirectory>${project.build.directory}/wars</outputDirectory>
+			              <overWriteReleases>false</overWriteReleases>
+			              <overWriteSnapshots>true</overWriteSnapshots>
+			            </configuration>
+			          </execution>
+			        </executions>
+			      </plugin>
+
+
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>schemagen</id>
+                        <goals>
+                            <goal>schemagen</goal>
+                        </goals>
+                    </execution>
+                </executions>
+ 
+                <configuration>
+                    <transformSchemas>
+                        <transformSchema>
+                            <uri>http://www.example.org/qualities</uri>
+                            <toPrefix>qualities</toPrefix>
+                            <toFile>qualities.xsd</toFile>
+                        </transformSchema>
+                        <transformSchema>
+                            <uri>http://www.example.org/quality</uri>
+                            <toPrefix>quality</toPrefix>
+                            <toFile>quality.xsd</toFile>
+                        </transformSchema>
+                    </transformSchemas>
+                    <includes>
+                        <include>fr/labri/progress/comet/model/jackson</include>
+                    </includes>
+                    <verbose>true</verbose>
+ 
+                </configuration>
+            </plugin>
+      
 		</plugins>
+		
+		
+		
 	</build>
 	<properties>
 		<slf4j.version>1.7.7</slf4j.version>

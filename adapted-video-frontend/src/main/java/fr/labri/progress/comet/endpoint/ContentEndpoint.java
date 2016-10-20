@@ -1,21 +1,18 @@
 package fr.labri.progress.comet.endpoint;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-
-import jersey.repackaged.com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,9 +21,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import fr.labri.progess.comet.model.Content;
 import fr.labri.progess.comet.model.ContentWrapper;
 import fr.labri.progress.comet.conf.CliConfSingleton;
-import fr.labri.progress.comet.exception.NoNewUriException;
 import fr.labri.progress.comet.exception.UnCachableContentException;
 import fr.labri.progress.comet.service.ContentService;
+import jersey.repackaged.com.google.common.collect.Lists;
 
 /**
  * provides access to content through jax-rs rest api
@@ -52,13 +49,22 @@ public class ContentEndpoint {
 	@Produces(MediaType.APPLICATION_XML)
 	public ContentWrapper list() {
 		ContentWrapper wrapper = new ContentWrapper();
+		
 		wrapper.setContents(Lists.newArrayList(contentService.getCache()));
 		return wrapper;
+	}
+	
+	@GET
+	@Path("{contentId}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Content getStatusEntity(@PathParam("contentId") String contentId) {
+		Content content = contentService.getContent(contentId);
+		return content;
 	}
 
 	@POST
 	@Consumes(MediaType.APPLICATION_XML)
-	public Response list(Content content) {
+	public Response postContent(Content content) {
 
 		try {
 			LOGGER.trace("new content {} candidate for caching",
@@ -78,9 +84,25 @@ public class ContentEndpoint {
 			@PathParam("quality") String quality) throws URISyntaxException {
 
 		URI newUri = UriBuilder.fromPath(CliConfSingleton.streamerBaseURL)
-				.path(contentId).path("encoding").path(quality + ".mp4")
+				.path(contentId).path(quality)
 				.build();
 		return Response.seeOther(newUri).build();
 
 	}
+	@Path("{contentId}/{quality}")
+	@POST
+	public Response postfile(@PathParam("contentId") String contentId,
+			@PathParam("quality") String quality, InputStream is) throws URISyntaxException {
+
+		URI newUri = UriBuilder.fromPath("http://"+ CliConfSingleton.storageHostname+":8079/api/storage")
+				.path(contentId).path(quality + ".mp4")
+				.build();
+		LOGGER.debug("redirect to {}",newUri.toString());
+		return Response.temporaryRedirect(newUri).build();
+
+	}
+	
+	
+
+	
 }

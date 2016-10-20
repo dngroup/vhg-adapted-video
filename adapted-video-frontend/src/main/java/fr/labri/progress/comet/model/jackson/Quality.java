@@ -3,7 +3,10 @@ package fr.labri.progress.comet.model.jackson;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.annotation.Generated;
+import javax.xml.bind.annotation.XmlType;
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -19,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "codec",
     "height"
 })
+@XmlType(namespace = "http://www.example.org/quality")
 public class Quality {
 
     @JsonProperty("name")
@@ -29,6 +33,8 @@ public class Quality {
     private String codec;
     @JsonProperty("height")
     private Integer height;
+    @JsonProperty("returnURL")
+    private String returnURL;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -121,5 +127,13 @@ public class Quality {
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
+
+	public String getReturnURL() {
+		return returnURL;
+	}
+
+	public void setReturnURL(String returnURL) {
+		this.returnURL = returnURL;
+	}
 
 }

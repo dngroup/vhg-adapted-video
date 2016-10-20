@@ -2,8 +2,11 @@
 package fr.labri.progress.comet.model.jackson;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
 import javax.annotation.Generated;
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,11 +25,17 @@ public class Kwargs {
     @JsonProperty("url")
     private String url;
     @JsonProperty("qualities")
-    private Qualities qualities;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private List<Quality> qualities;
 
-    /**
+
+	@JsonIgnore
+    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    
+    @JsonProperty("returnURL")
+    private String returnURL;
+    @JsonProperty("cacheURL")
+	private String cacheURL;
+	/**
      * 
      * @return
      *     The url
@@ -52,7 +61,7 @@ public class Kwargs {
      *     The qualities
      */
     @JsonProperty("qualities")
-    public Qualities getQualities() {
+    public List<Quality> getQualities() {
         return qualities;
     }
 
@@ -62,9 +71,9 @@ public class Kwargs {
      *     The qualities
      */
     @JsonProperty("qualities")
-    public void setQualities(Qualities qualities) {
-        this.qualities = qualities;
-    }
+    public void setQualities(List<Quality> qualities) {
+		this.qualities = qualities;
+	}
 
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
@@ -75,5 +84,47 @@ public class Kwargs {
     public void setAdditionalProperty(String name, Object value) {
         this.additionalProperties.put(name, value);
     }
+
+	/**
+	 * 
+	 * @return
+	 *     The returnAddr
+	 */
+	@JsonProperty("returnURL")
+	public String getReturnUrl() {
+	    return returnURL;
+	}
+
+	/**
+	 * 
+	 * @param eta
+	 *     The returnAddr
+	 */
+	@JsonProperty("returnURL")
+	public void setReturnAddr(String returnUrl) {
+	    this.returnURL = returnUrl;
+	}
+
+	/**
+	 * 
+	 * @return
+	 *     The cacheAddr
+	 */
+	@JsonProperty("cacheURL")
+	public String getCacheUrl() {
+	    return cacheURL;
+	}
+
+	/**
+	 * 
+	 * @param eta
+	 *     The cacheAddr
+	 */
+	@JsonProperty("cacheURL")
+	public void setCacheAddr(String cacheUrl) {
+	    this.cacheURL = cacheUrl;
+	}
+
+
 
 }
