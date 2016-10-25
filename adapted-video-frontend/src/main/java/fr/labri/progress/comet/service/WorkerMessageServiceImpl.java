@@ -91,9 +91,8 @@ public class WorkerMessageServiceImpl implements WorkerMessageService {
 
 		Transcode transcode = new Transcode();
 		transcode.setId(id);
-		transcode.setEta(ISODateTimeFormat.dateTimeNoMillis().print(DateTime.now().minusHours(200)));
+		transcode.setEta(ISODateTimeFormat.dateTimeNoMillis().print(DateTime.now().minusHours(0)));
 		transcode.setRetries(1);
-		// TODO:uncomment Follow linegeneratePushURL
 		stroageService.createStorageFolder(id);
 
 		Kwargs kwargs = new Kwargs();
